@@ -1,5 +1,5 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  ENEBA PRICE TRACKER (CORREGIDO MULTI-COPA)                                 ║
+# ║  ENEBA PRICE TRACKER (SLUG JPY CORREGIDO Y MULTI-COPA)                       ║
 # ║  Trackea ratios de tarjetas Xbox en Eneba y avisa por Telegram               ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -138,7 +138,7 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-2500-jpy-xbox-live-key-japan",  "valor": 2500},
             {"slug": "xbox-xbox-live-gift-card-3000-jpy-xbox-live-key-japan",  "valor": 3000},
             {"slug": "xbox-xbox-live-gift-card-5000-jpy-xbox-live-key-japan",  "valor": 5000},
-            {"slug": "xbox-xbox-live-gift-card-10000-jpy-xbox-live-key-japan", "valor": 10000},
+            {"slug": "xbox-xbox-live-gift-card-10-000-jpy-xbox-live-key-japan", "valor": 10000},  # 🎉 SLUG CORREGIDO CON TU ENLACE
         ],
         "umbral": UMBRALES["JPY"]["umbral"],
         "umbral_bajo": UMBRALES["JPY"]["umbral_bajo"],
@@ -520,7 +520,6 @@ def marcar_resumen_enviado(tipo, estado, ahora):
     elif tipo == "semanal":
         estado["resumenes"]["ultimo_semanal"] = f"{ahora.isocalendar()[0]}-W{ahora.isocalendar()[1]}"
 
-# ─── PARCHE CRÍTICO: MULTI-COPA POR EMPATE DE RATIO ───────────────────────────
 def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
     con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
     lineas = [f"{config['bandera']} <b>{moneda}</b>"]
@@ -534,7 +533,6 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
         lineas.append("")
         return lineas
 
-    # Encontrar el ratio máximo absoluto de esta moneda
     mejor_ratio = max(r["ratio"] for r in con_stock)
 
     for r in resultados:
@@ -542,7 +540,7 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
             lineas.append(f"  {r['valor']} {moneda} → ⚠️ API no disponible")
         elif r["stock"] != "ok":
             lineas.append(f"  {r['valor']} {moneda} → ⚫ Sin stock")
-        elif round(r["ratio"], 2) == round(mejor_ratio, 2):  # COMPROBACIÓN CORREGIDA: Si empata con el mejor ratio, copa y negrita
+        elif round(r["ratio"], 2) == round(mejor_ratio, 2):  # Comprobación de empate (copas múltiples)
             lineas.append(f"  🏆 <b>{r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€</b>")
         else:
             lineas.append(f"  {r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€")
