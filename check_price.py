@@ -181,7 +181,7 @@ def safe_get(url, **kwargs):
     for intento in range(3):
         try:
             resp = session.get(url, timeout=kwargs.get("timeout", 10), headers=kwargs.get("headers"), params=kwargs.get("params"))
-            if resp.status_code < 500:  # Errores 4xx no reintentamos
+            if resp.status_code not in (429, 500, 502, 503, 504):  # Reintentamos 429 y 5xx
                 return resp
             time.sleep(1 * (intento + 1))
         except Exception:
@@ -192,7 +192,7 @@ def safe_post(url, **kwargs):
     for intento in range(3):
         try:
             resp = session.post(url, timeout=kwargs.get("timeout", 10), json=kwargs.get("json"), headers=kwargs.get("headers"))
-            if resp.status_code < 500:
+            if resp.status_code not in (429, 500, 502, 503, 504):  # Reintentamos 429 y 5xx
                 return resp
             time.sleep(1 * (intento + 1))
         except Exception:
@@ -203,7 +203,7 @@ def safe_put(url, **kwargs):
     for intento in range(3):
         try:
             resp = session.put(url, timeout=kwargs.get("timeout", 10), json=kwargs.get("json"), headers=kwargs.get("headers"))
-            if resp.status_code < 500:
+            if resp.status_code not in (409, 429, 500, 502, 503, 504):  # Reintentamos 409, 429 y 5xx
                 return resp
             time.sleep(1 * (intento + 1))
         except Exception:
@@ -222,15 +222,21 @@ def send_telegram(msg):
         print(f"Error enviando Telegram: {e}")
 
 def send_telegram_file(filename, content, caption=""):
-    try:
-        session.post(
-            f"https://api.telegram.org/bot{TOKEN}/sendDocument",
-            data={"chat_id": CHAT_ID, "caption": caption},
-            files={"document": (filename, content, "text/csv")},
-            timeout=30
-        )
-    except Exception as e:
-        print(f"Error enviando archivo Telegram: {e}")
+    # Punto 6: Usar reintentos para envío de archivos a Telegram
+    for intento in range(3):
+        try:
+            resp = session.post(
+                f"https://api.telegram.org/bot{TOKEN}/sendDocument",
+                data={"chat_id": CHAT_ID, "caption": caption},
+                files={"document": (filename, content, "text/csv")},
+                timeout=30
+            )
+            if resp and resp.status_code not in (429, 500, 502, 503, 504):
+                return
+            time.sleep(1 * (intento + 1))
+        except Exception as e:
+            print(f"Error enviando archivo Telegram: {e}")
+            time.sleep(1 * (intento + 1))
 
 # --- Fallback de tipo de cambio ---
 def get_tipo_cambio_real(monedas, estado):
@@ -334,44 +340,54 @@ def cargar_estado():
     return {"monedas": {}, "historial": [], "resumenes": {}, "stock": {}, "sha_error_alertado": False, "ultimos_tipos_cambio": {}}
 
 def guardar_estado(estado):
-    try:
-        r = safe_get(
-            f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
-            headers=GITHUB_HEADERS,
-            timeout=10
-        )
-        sha = None
-        if r and r.status_code == 200:
-            res_json = r.json()
-            sha = res_json.get("sha")
-            try:
-                contenido_previo = json.loads(base64.b64decode(res_json["content"]).decode("utf-8"))
-                historial_viejo = len(contenido_previo.get("historial", []))
-                historial_nuevo = len(estado.get("historial", []))
-                if historial_viejo > 0 and historial_nuevo == 0:
-                    print("🛑 ABORTO DE SEGURIDAD: El historial se ha vaciado a 0 inesperadamente.")
-                    return
-            except Exception:
-                pass
+    # Punto 1: Manejar condición de carrera con reintentos ante 409 Conflict
+    for intento_guardado in range(3):
+        try:
+            r = safe_get(
+                f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
+                headers=GITHUB_HEADERS,
+                timeout=10
+            )
+            sha = None
+            if r and r.status_code == 200:
+                res_json = r.json()
+                sha = res_json.get("sha")
+                try:
+                    contenido_previo = json.loads(base64.b64decode(res_json["content"]).decode("utf-8"))
+                    historial_viejo = len(contenido_previo.get("historial", []))
+                    historial_nuevo = len(estado.get("historial", []))
+                    if historial_viejo > 0 and historial_nuevo == 0:
+                        print("🛑 ABORTO DE SEGURIDAD: El historial se ha vaciado a 0 inesperadamente.")
+                        return
+                except Exception:
+                    pass
 
-        contenido = json.dumps(estado, indent=2).encode("utf-8")
-        contenido_b64 = base64.b64encode(contenido).decode("utf-8")
-        
-        body = {
-            "message": "Actualizar estado",
-            "content": contenido_b64,
-        }
-        if sha:
-            body["sha"] = sha
-        safe_put(
-            f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
-            headers=GITHUB_HEADERS,
-            json=body,
-            timeout=10
-        )
-        print("Estado guardado en GitHub ✅")
-    except Exception as e:
-        print(f"Error guardando estado: {e}")
+            contenido = json.dumps(estado, indent=2).encode("utf-8")
+            contenido_b64 = base64.b64encode(contenido).decode("utf-8")
+            
+            body = {
+                "message": "Actualizar estado",
+                "content": contenido_b64,
+            }
+            if sha:
+                body["sha"] = sha
+            res_put = safe_put(
+                f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
+                headers=GITHUB_HEADERS,
+                json=body,
+                timeout=10
+            )
+            if res_put and res_put.status_code == 409:
+                # 409 Conflict: otro proceso modificó el archivo, releer y reintentar
+                print(f"⚠️ Conflicto 409 al guardar estado (intento {intento_guardado+1}/3), releyendo...")
+                time.sleep(2)
+                continue
+            print("Estado guardado en GitHub ✅")
+            return
+        except Exception as e:
+            print(f"Error guardando estado: {e}")
+            return
+    print("❌ No se pudo guardar el estado tras 3 intentos por conflictos 409.")
 
 def debe_comprobar_slug(slug, estado, ahora):
     info = estado.get("stock", {}).get(slug)
@@ -543,16 +559,33 @@ def guardar_historial(moneda, resultados, estado, ahora):
         # Agrupar entradas viejas por mes real (basado en timestamp de cada registro)
         entradas_por_mes = defaultdict(list)
         for e in entradas_viejas:
-            # Extraer año-mes del timestamp (formato ISO: "2026-06-11T...")
-            mes_key = e["timestamp"][:7]  # "2026-06"
-            entradas_por_mes[mes_key].append(e)
+            # Punto 7: Validar timestamp antes de procesar para evitar fallos por datos corruptos
+            try:
+                ts = e.get("timestamp", "")
+                if not ts or len(ts) < 7:
+                    print(f"⚠️ Entrada con timestamp inválido ignorada: {e}")
+                    continue
+                # Extraer año-mes del timestamp (formato ISO: "2026-06-11T...")
+                mes_key = ts[:7]  # "2026-06"
+                datetime.strptime(mes_key, "%Y-%m")  # Validar formato
+                entradas_por_mes[mes_key].append(e)
+            except Exception:
+                print(f"⚠️ Entrada con timestamp corrupto ignorada: {e}")
+                continue
         
+        # Punto 2: Solo eliminar del historial principal si TODOS los archivados fueron exitosos
+        archivado_exitoso = True
         for mes_key, grupo in entradas_por_mes.items():
             fecha_mes = datetime.strptime(mes_key, "%Y-%m")
-            archivar_en_log_mensual(grupo, fecha_mes)
+            if not archivar_en_log_mensual(grupo, fecha_mes):
+                archivado_exitoso = False
+                print(f"⚠️ Archivado fallido para {mes_key}, no se eliminan entradas del historial principal.")
         
-        # Dejar únicamente lo nuevo (últimos 30 días) en el JSON principal
-        estado["historial"] = [h for h in estado["historial"] if h["timestamp"] >= limite_caliente]
+        if archivado_exitoso:
+            # Dejar únicamente lo nuevo (últimos 30 días) en el JSON principal
+            estado["historial"] = [h for h in estado["historial"] if h["timestamp"] >= limite_caliente]
+        else:
+            print("⚠️ No se limpió el historial principal por fallos en el archivado mensual.")
 
 def archivar_en_log_mensual(entradas, fecha_archivo):
     """Guarda los registros antiguos en un archivo JSON independiente por Año_Mes en GitHub"""
@@ -587,8 +620,13 @@ def archivar_en_log_mensual(entradas, fecha_archivo):
     if sha_archivo: 
         body["sha"] = sha_archivo
     
-    safe_put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
-    print(f"Archivadas {len(entradas)} entradas viejas en {nombre_archivo_mes} 📦")
+    res = safe_put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
+    if res and res.status_code in (200, 201):
+        print(f"Archivadas {len(entradas)} entradas viejas en {nombre_archivo_mes} 📦")
+        return True
+    else:
+        print(f"❌ Error al archivar en {nombre_archivo_mes}: {res.status_code if res else 'sin respuesta'}")
+        return False
 
 def debe_enviar_resumen(tipo, estado, ahora):
     ultimo = estado.get("resumenes", {}).get(f"ultimo_{tipo}")
@@ -686,6 +724,11 @@ def main():
     estado = cargar_estado()
     tipos_cambio = get_tipo_cambio_real(list(MONEDAS.keys()), estado)
 
+    # Punto 4: Avisar si no hay tipos de cambio disponibles
+    if not tipos_cambio:
+        send_telegram("⚠️ <b>Tracker ciego:</b> No hay tipos de cambio disponibles (API caída y sin fallback). Las alertas de arbitraje no funcionarán hasta que se recupere.")
+        print("⚠️ Sin tipos de cambio disponibles.")
+
     accion = os.environ.get("INPUT_ACCION", "").lower().strip()
     resumen_forzado = accion in PALABRAS_RESUMEN
 
@@ -695,6 +738,11 @@ def main():
     for moneda, config in MONEDAS.items():
         print(f"  Obteniendo {moneda}...")
         todos_resultados[moneda] = get_ratios_moneda(config, estado, ahora)
+        # Punto 2: Si el SHA es inválido, abortar toda la ejecución tras el primer fallo
+        if estado.get("sha_error_alertado"):
+            print("🛑 SHA inválido detectado. Abortando escaneo para evitar spam.")
+            guardar_estado(estado)
+            return
 
     # Si se pulsa el botón manual, procesa el resumen con los datos frescos y corta ejecución
     if resumen_forzado:
