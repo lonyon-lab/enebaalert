@@ -11,7 +11,7 @@ UMBRALES = {
     "TRY": {"umbral": 52.7,   "umbral_bajo": 48},
     "BRL": {"umbral": 6.8,    "umbral_bajo": 5.5},
     "CLP": {"umbral": 42,     "umbral_bajo": 33},
-    "COP": {"umbral": 4200,   "umbral_bajo": 3300},
+    "COP": {"umbral": 4300,   "umbral_bajo": 3300},
     "ZAR": {"umbral": 20.5,   "umbral_bajo": 16},
     "SAR": {"umbral": 4.45,   "umbral_bajo": 3.2},
     "TWD": {"umbral": 38,     "umbral_bajo": 30},
@@ -588,6 +588,8 @@ def enviar_resumen_semanal(estado, ahora):
     send_telegram("\n".join(lineas))
     marcar_resumen_enviado("semanal", estado, ahora)
 
+PALABRAS_RESUMEN = ["resu", "resumen", "lista", "enviar", "envio", "precios", "precio", "prices", "summary"]
+
 def main():
     ahora = datetime.now(timezone.utc)
     hora_utc = ahora.hour
@@ -596,6 +598,16 @@ def main():
     estado = cargar_estado()
 
     tipos_cambio = get_tipo_cambio_real(list(MONEDAS.keys()))
+
+    # Comprobar si se pidió resumen manual
+    accion = os.environ.get("INPUT_ACCION", "").lower().strip()
+    resumen_forzado = accion in PALABRAS_RESUMEN
+
+    if resumen_forzado:
+        print(f"Resumen forzado por acción: {accion}")
+        enviar_resumen_diario(estado, ahora, tipos_cambio)
+        guardar_estado(estado)
+        return
 
     # Resúmenes (independientes del flujo normal)
     if es_lunes and hora_utc >= 9 and debe_enviar_resumen("semanal", estado, ahora):
