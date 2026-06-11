@@ -142,7 +142,11 @@ import csv
 import io
 import base64
 import requests
+import random
 from datetime import datetime, timezone, timedelta
+
+# ─── SESIÓN PERSISTENTE (MEJORA ANTI-BAN) ─────────────────────────────────────
+session = requests.Session()
 
 # ─── TELEGRAM ─────────────────────────────────────────────────────────────────
 TOKEN = os.environ["TELEGRAM_TOKEN"]
@@ -165,14 +169,16 @@ HEADERS = {
     "content-type": "application/json",
     "Origin": "https://www.eneba.com",
     "Referer": "https://www.eneba.com/",
+    "Connection": "keep-alive"
 }
+session.headers.update(HEADERS)
 
 HORAS_RECHECK_SIN_STOCK = 2
 
 # ─── FUNCIONES ORIGINALES DE TELEGRAM, API Y GITHUB ───────────────────────────
 def send_telegram(msg):
     try:
-        requests.get(
+        session.get(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
             params={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"},
             timeout=10
@@ -182,7 +188,7 @@ def send_telegram(msg):
 
 def send_telegram_file(filename, content, caption=""):
     try:
-        requests.post(
+        session.post(
             f"https://api.telegram.org/bot{TOKEN}/sendDocument",
             data={"chat_id": CHAT_ID, "caption": caption},
             files={"document": (filename, content, "text/csv")},
@@ -193,7 +199,7 @@ def send_telegram_file(filename, content, caption=""):
 
 def get_tipo_cambio_real(monedas):
     try:
-        r = requests.get(
+        r = session.get(
             "https://open.er-api.com/v6/latest/EUR",
             timeout=5
         )
@@ -224,10 +230,9 @@ def get_price(slug, estado):
         }
     }
     try:
-        r = requests.post(
+        r = session.post(
             "https://graphql.eneba.com/graphql/",
             json=body,
-            headers=HEADERS,
             timeout=10
         )
         if r.status_code != 200:
@@ -278,7 +283,7 @@ def get_price(slug, estado):
 
 def cargar_estado():
     try:
-        r = requests.get(
+        r = session.get(
             f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
             headers=GITHUB_HEADERS,
             timeout=10
@@ -292,7 +297,7 @@ def cargar_estado():
 
 def guardar_estado(estado):
     try:
-        r = requests.get(
+        r = session.get(
             f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
             headers=GITHUB_HEADERS,
             timeout=10
@@ -320,7 +325,7 @@ def guardar_estado(estado):
         }
         if sha:
             body["sha"] = sha
-        requests.put(
+        session.put(
             f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
             headers=GITHUB_HEADERS,
             json=body,
@@ -384,7 +389,8 @@ def get_ratios_moneda(config, estado, ahora):
             resultados.append({"valor": valor, "precio_eur": None, "ratio": None, "stock": "sin_stock"})
             print(f"  {valor} = ⚫ Sin stock")
 
-        time.sleep(0.5)
+        # JITTER: Pausa aleatoria para evitar detección de bot
+        time.sleep(random.uniform(0.8, 1.8))
     return resultados
 
 def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
@@ -508,7 +514,7 @@ def archivar_en_log_mensual(entradas, fecha_archivo):
     sha_archivo = None
     
     # 1. Intentar descargar el archivo mensual si ya existe en el repositorio
-    res = requests.get(url_gh, headers=GITHUB_HEADERS, timeout=10)
+    res = session.get(url_gh, headers=GITHUB_HEADERS, timeout=10)
     if res.status_code == 200:
         res_json = res.json()
         sha_archivo = res_json.get("sha")
@@ -529,7 +535,7 @@ def archivar_en_log_mensual(entradas, fecha_archivo):
     if sha_archivo: 
         body["sha"] = sha_archivo
         
-    requests.put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
+    session.put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
     print(f"Archivadas {len(entradas)} entradas viejas en {nombre_archivo_mes} 📦")
 
 def debe_enviar_resumen(tipo, estado, ahora):
