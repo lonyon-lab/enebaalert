@@ -5,14 +5,14 @@
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "BRL": {
       "ultimo_ratio_alertado": null,
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "CLP": {
       "ultimo_ratio_alertado": null,
