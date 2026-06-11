@@ -1,23 +1,30 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  ENEBA PRICE TRACKER (SLUG JPY CORREGIDO Y MULTI-COPA)                       ║
+# ║  ENEBA PRICE TRACKER (MÁRGENES DINÁMICOS PORCENTUALES Y ANTI-SPAM)          ║
 # ║  Trackea ratios de tarjetas Xbox en Eneba y avisa por Telegram               ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 # ─── SHA (ACTUALIZAR SI LA API FALLA) ────────────────────────────────────────
 SHA = "c3aaf0194bab3a8481512069d9bbc707037714c0a60f603497bc820f00a91c11_50e5e0d9351bb05ab629b0eda9b116ae4d96fbb6861836383bc404f1ab5e3680094635224c07d364fff371b7517712ebd33ce0f05504f2fa7e9d66e321168e02"
 
-# ─── UMBRALES (EDITAR AQUÍ) ───────────────────────────────────────────────────
-UMBRALES = {
-    "TRY": {"umbral": 52.7,   "umbral_bajo": 48},
-    "BRL": {"umbral": 6.8,    "umbral_bajo": 5.5},
-    "CLP": {"umbral": 42,     "umbral_bajo": 33},
-    "COP": {"umbral": 4300,   "umbral_bajo": 3300},
-    "ZAR": {"umbral": 20.5,   "umbral_bajo": 16},
-    "SAR": {"umbral": 4.45,   "umbral_bajo": 3.2},
-    "TWD": {"umbral": 38,     "umbral_bajo": 30},
-    "HKD": {"umbral": 9.2,    "umbral_bajo": 7.2},
-    "JPY": {"umbral": 167,    "umbral_bajo": 155},
+# ─── MÁRGENES DINÁMICOS EXIGENTES (PORCENTAJES VS MERCADO) ────────────────────
+#  > 1.00 significa Arbitraje (ganas dinero frente al cambio oficial del banco).
+#  Filtro avanzado para evitar alertas con precios normales de mercado.
+MARGENES_OBJETIVO = {
+    "BRL": 1.090,   # 🇧🇷 Exiges un +9.0% sobre el mercado (Evita alertas con el +7.6% de hoy)
+    "COP": 1.050,   # 🇨🇴 Exiges un +5.0% sobre el mercado (Evita alertas con el +3.6% de hoy)
+    "ZAR": 1.045,   # 🇿🇦 Exiges un +4.5% sobre el mercado (Evita alertas con el +3.2% de hoy)
+    "SAR": 1.035,   # 🇸🇦 Exiges un +3.5% sobre el mercado (Evita alertas con el +2.3% de hoy)
+    
+    # Monedas estables o caras donde superar al banco ya es una anomalía brutal:
+    "TRY": 1.015,   # 🇹🇷 Exiges un +1.5% sobre el mercado oficial.
+    "TWD": 1.015,   # 🇹🇼 Exiges un +1.5% sobre el mercado oficial.
+    "HKD": 1.015,   # 🇭🇰 Exiges un +1.5% sobre el mercado oficial.
+    "JPY": 1.005,   # 🇯🇵 Exiges un +0.5% (Solo avisa si consigues más yenes de lo que vale el euro)
+    "CLP": 1.030,   # 🇨🇱 Exiges un +3.0% sobre el mercado oficial.
 }
+
+# Margen de aviso de "atraco" (Cuando el precio se infla demasiado en Eneba)
+MARGEN_ALTO_ATRACO = 0.90  # Si el ratio es peor que un -10% vs mercado, avisa de precio alto
 
 # ─── CONFIGURACIÓN DE MONEDAS ─────────────────────────────────────────────────
 MONEDAS = {
@@ -30,8 +37,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-100-try-xbox-live-key-turkey", "valor": 100},
             {"slug": "xbox-xbox-live-gift-card-300-try-xbox-live-key-turkey", "valor": 300},
         ],
-        "umbral": UMBRALES["TRY"]["umbral"],
-        "umbral_bajo": UMBRALES["TRY"]["umbral_bajo"],
     },
     "BRL": {
         "nombre": "Real brasileño",
@@ -46,8 +51,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-50-brl-xbox-live-key-brazil",  "valor": 50},
             {"slug": "xbox-xbox-live-gift-card-100-brl-xbox-live-key-brazil", "valor": 100},
         ],
-        "umbral": UMBRALES["BRL"]["umbral"],
-        "umbral_bajo": UMBRALES["BRL"]["umbral_bajo"],
     },
     "CLP": {
         "nombre": "Peso chileno",
@@ -57,8 +60,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-20-000-clp-xbox-live-key-chile", "valor": 20000},
             {"slug": "xbox-xbox-live-gift-card-35-000-clp-xbox-live-key-chile", "valor": 35000},
         ],
-        "umbral": UMBRALES["CLP"]["umbral"],
-        "umbral_bajo": UMBRALES["CLP"]["umbral_bajo"],
     },
     "COP": {
         "nombre": "Peso colombiano",
@@ -69,8 +70,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-100-000-cop-key-colombia",  "valor": 100000},
             {"slug": "xbox-xbox-live-gift-card-150-000-cop-key-colombia",  "valor": 150000},
         ],
-        "umbral": UMBRALES["COP"]["umbral"],
-        "umbral_bajo": UMBRALES["COP"]["umbral_bajo"],
     },
     "ZAR": {
         "nombre": "Rand sudafricano",
@@ -89,8 +88,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-550-zar-xbox-live-key-south-africa", "valor": 550},
             {"slug": "xbox-xbox-live-gift-card-600-zar-xbox-live-key-south-africa", "valor": 600},
         ],
-        "umbral": UMBRALES["ZAR"]["umbral"],
-        "umbral_bajo": UMBRALES["ZAR"]["umbral_bajo"],
     },
     "SAR": {
         "nombre": "Riyal saudí",
@@ -101,8 +98,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-200-sar-xbox-live-key-saudi-arabia", "valor": 200},
             {"slug": "xbox-xbox-live-gift-card-300-sar-xbox-live-key-saudi-arabia", "valor": 300},
         ],
-        "umbral": UMBRALES["SAR"]["umbral"],
-        "umbral_bajo": UMBRALES["SAR"]["umbral_bajo"],
     },
     "TWD": {
         "nombre": "Dólar taiwanés",
@@ -114,8 +109,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-1000-twd-xbox-live-key-taiwan", "valor": 1000},
             {"slug": "xbox-xbox-live-gift-card-2000-twd-xbox-live-key-taiwan", "valor": 2000},
         ],
-        "umbral": UMBRALES["TWD"]["umbral"],
-        "umbral_bajo": UMBRALES["TWD"]["umbral_bajo"],
     },
     "HKD": {
         "nombre": "Dólar de Hong Kong",
@@ -125,8 +118,6 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-300-hkd-xbox-live-key-hong-kong", "valor": 300},
             {"slug": "xbox-xbox-live-gift-card-600-hkd-xbox-live-key-hong-kong", "valor": 600},
         ],
-        "umbral": UMBRALES["HKD"]["umbral"],
-        "umbral_bajo": UMBRALES["HKD"]["umbral_bajo"],
     },
     "JPY": {
         "nombre": "Yen japonés",
@@ -138,10 +129,8 @@ MONEDAS = {
             {"slug": "xbox-xbox-live-gift-card-2500-jpy-xbox-live-key-japan",  "valor": 2500},
             {"slug": "xbox-xbox-live-gift-card-3000-jpy-xbox-live-key-japan",  "valor": 3000},
             {"slug": "xbox-xbox-live-gift-card-5000-jpy-xbox-live-key-japan",  "valor": 5000},
-            {"slug": "xbox-xbox-live-gift-card-10-000-jpy-xbox-live-key-japan", "valor": 10000},  # 🎉 SLUG CORREGIDO CON TU ENLACE
+            {"slug": "xbox-xbox-live-gift-card-10-000-jpy-xbox-live-key-japan", "valor": 10000},
         ],
-        "umbral": UMBRALES["JPY"]["umbral"],
-        "umbral_bajo": UMBRALES["JPY"]["umbral_bajo"],
     },
 }
 
@@ -413,18 +402,12 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
     if not con_stock:
         if hay_api_error:
             if not estado_moneda.get("api_error_alertado"):
-                send_telegram(
-                    f"⚠️ <b>API no disponible: {config['bandera']} {moneda}</b>\n"
-                    f"No se pudo obtener el precio."
-                )
+                send_telegram(f"⚠️ <b>API no disponible: {config['bandera']} {moneda}</b>")
                 estado_moneda["api_error_alertado"] = True
         elif sin_stock_confirmado:
             estado_moneda["api_error_alertado"] = False
             if not estado_moneda.get("sin_datos_alertado"):
-                send_telegram(
-                    f"⚠️ <b>Sin stock: {config['bandera']} {moneda}</b>\n"
-                    f"Ninguna tarjeta disponible en este momento."
-                )
+                send_telegram(f"⚠️ <b>Sin stock: {config['bandera']} {moneda}</b>")
                 estado_moneda["sin_datos_alertado"] = True
         estado["monedas"][moneda] = estado_moneda
         return
@@ -434,27 +417,31 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
 
     mejor = max(con_stock, key=lambda x: x["ratio"])
     mejor_ratio = mejor["ratio"]
-    umbral = config["umbral"]
-    umbral_bajo = config["umbral_bajo"]
     tipo_cambio = tipos_cambio.get(moneda)
 
-    comparativa = ""
-    if tipo_cambio:
-        margen = ((mejor_ratio / tipo_cambio) - 1) * 100
-        signo = "+" if margen >= 0 else ""
-        comparativa = f"\n💱 Cambio real: {tipo_cambio:.2f} {moneda}/€ ({signo}{margen:.1f}% vs mercado)"
+    if not tipo_cambio:
+        return  # Sin cambio del banco en vivo, abortamos evaluación dinámica
 
-    if mejor_ratio < umbral_bajo and not estado_moneda.get("bajo_umbral_bajo"):
+    # 🧠 CÁLCULO DINÁMICO RESTRINGIDO DE UMBRALES
+    umbral_compra = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
+    umbral_atraco = tipo_cambio * MARGEN_ALTO_ATRACO
+
+    margen = ((mejor_ratio / tipo_cambio) - 1) * 100
+    signo = "+" if margen >= 0 else ""
+    comparativa = f"\n💱 Cambio real: {tipo_cambio:.2f} {moneda}/€ ({signo}{margen:.1f}% vs mercado)"
+
+    # Alerta de precio inflado (Atraco en el mercado gris)
+    if mejor_ratio < umbral_atraco and not estado_moneda.get("bajo_umbral_bajo"):
         send_telegram(
-            f"📉 <b>Precio alto {config['bandera']} {moneda}</b>\n"
-            f"Ratio actual: {mejor_ratio:.2f} {moneda}/€\n"
-            f"Por debajo de tu mínimo de {umbral_bajo}{comparativa}"
+            f"📉 <b>Precio inflado {config['bandera']} {moneda}</b>\n"
+            f"Ratio actual: {mejor_ratio:.2f} {moneda}/€{comparativa}"
         )
         estado_moneda["bajo_umbral_bajo"] = True
-    elif mejor_ratio >= umbral_bajo:
+    elif mejor_ratio >= umbral_atraco:
         estado_moneda["bajo_umbral_bajo"] = False
 
-    if mejor_ratio >= umbral:
+    # Alerta de Arbitraje Real (Compra rentable blindada)
+    if mejor_ratio >= umbral_compra:
         ultimo = estado_moneda.get("ultimo_ratio_alertado")
         debe_alertar = False
         if not estado_moneda.get("sobre_umbral"):
@@ -464,8 +451,8 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
 
         if debe_alertar:
             send_telegram(
-                f"🚨 <b>Alerta {config['bandera']} {moneda}</b>\n"
-                f"Mejor ratio: <b>{mejor_ratio:.2f} {moneda}/€</b>\n"
+                f"🚨 <b>¡Arbitraje Cazado! {config['bandera']} {moneda}</b>\n"
+                f"Mejor ratio: <b>{mejor_ratio:.2f} {moneda}/€</b> (Objetivo: >={umbral_compra:.2f})\n"
                 f"Tarjeta: {mejor['valor']} {moneda} por {mejor['precio_eur']:.2f}€"
                 f"{comparativa}"
             )
@@ -540,14 +527,14 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
             lineas.append(f"  {r['valor']} {moneda} → ⚠️ API no disponible")
         elif r["stock"] != "ok":
             lineas.append(f"  {r['valor']} {moneda} → ⚫ Sin stock")
-        elif round(r["ratio"], 2) == round(mejor_ratio, 2):  # Comprobación de empate (copas múltiples)
+        elif round(r["ratio"], 2) == round(mejor_ratio, 2):  # Soporte multi-copa si empatan ratios
             lineas.append(f"  🏆 <b>{r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€</b>")
         else:
             lineas.append(f"  {r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€")
 
-    lineas.append(f"  (umbral: {config['umbral']})")
-
     if tipo_cambio:
+        objetivo_hoy = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
+        lineas.append(f"  (Objetivo compra hoy: >{objetivo_hoy:.2f})")
         mejor = max(con_stock, key=lambda x: x["ratio"])
         margen = ((mejor['ratio'] / tipo_cambio) - 1) * 100
         signo = "+" if margen >= 0 else ""
