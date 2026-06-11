@@ -534,7 +534,8 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
         lineas.append("")
         return lineas
 
-    mejor = max(con_stock, key=lambda x: x["ratio"])
+    mejor_ratio = max(r["ratio"] for r in con_stock)
+    mejor = max((r for r in con_stock if r["ratio"] == mejor_ratio), key=lambda x: x["valor"])
 
     for r in resultados:
         if r["stock"] == "api_error":
