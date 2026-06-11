@@ -436,6 +436,7 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
     if mejor_ratio < umbral_atraco and not estado_moneda.get("bajo_umbral_bajo"):
         send_telegram(
             f"📉 <b>Precio inflado {config['bandera']} {moneda}</b>\n"
+            f"Tarjeta: <b>{mejor['valor']} {moneda}</b> por <b>{mejor['precio_eur']:.2f}€</b>\n"
             f"Ratio actual: {mejor_ratio:.2f} {moneda}/€{comparativa}"
         )
         estado_moneda["bajo_umbral_bajo"] = True
