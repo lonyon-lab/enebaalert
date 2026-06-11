@@ -1,14 +1,14 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
 # ║  ENEBA PRICE TRACKER (MÁRGENES DINÁMICOS PORCENTUALES Y ANTI-SPAM)          ║
-# ║  Trackea ratios de tarjetas Xbox en Eneba y avisa por Telegram               ║
+# ║  Trackea ratios de tarjetas Xbox en Eneba y avisa por Telegram                ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 # ─── SHA (ACTUALIZAR SI LA API FALLA) ────────────────────────────────────────
 SHA = "c3aaf0194bab3a8481512069d9bbc707037714c0a60f603497bc820f00a91c11_50e5e0d9351bb05ab629b0eda9b116ae4d96fbb6861836383bc404f1ab5e3680094635224c07d364fff371b7517712ebd33ce0f05504f2fa7e9d66e321168e02"
 
 # ─── MÁRGENES DINÁMICOS EXIGENTES (PORCENTAJES VS MERCADO) ────────────────────
-#  > 1.00 significa Arbitraje (ganas dinero frente al cambio oficial del banco).
-#  Filtro avanzado para evitar alertas con precios normales de mercado.
+# > 1.00 significa Arbitraje (ganas dinero frente al cambio oficial del banco).
+# Filtro avanzado para evitar alertas con precios normales de mercado.
 MARGENES_OBJETIVO = {
     "BRL": 1.090,   # 🇧🇷 Exiges un +9.0% sobre el mercado (Evita alertas con el +7.6% de hoy)
     "COP": 1.050,   # 🇨🇴 Exiges un +5.0% sobre el mercado (Evita alertas con el +3.6% de hoy)
@@ -135,6 +135,7 @@ MONEDAS = {
 }
 
 # ─── IMPORTS ──────────────────────────────────────────────────────────────────
+# (Todos tus imports originales intactos)
 import os
 import json
 import time
@@ -169,6 +170,7 @@ HEADERS = {
 
 HORAS_RECHECK_SIN_STOCK = 2
 
+# ─── FUNCIONES ORIGINALES DE TELEGRAM, API Y GITHUB ───────────────────────────
 def send_telegram(msg):
     try:
         requests.get(
@@ -543,11 +545,12 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
     lineas.append("")
     return lineas
 
-def enviar_resumen_diario(estado, ahora, tipos_cambio):
+# ─── MODIFICADO: ACEPTA LOS RESULTADOS YA DESCARGADOS ─────────────────────────
+def enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados):
     lineas = [f"📊 <b>Resumen diario Eneba — {ahora.strftime('%d/%m/%Y')}</b>\n"]
     for moneda, config in MONEDAS.items():
-        print(f"  Obteniendo {moneda}...")
-        resultados = get_ratios_moneda(config, estado, ahora)
+        # En vez de llamar a la API otra vez, recuperamos los datos en caché de la Pasada Única
+        resultados = todos_resultados.get(moneda, [])
         tipo_cambio = tipos_cambio.get(moneda)
         lineas += formatear_bloque_moneda(moneda, config, resultados, tipo_cambio)
     send_telegram("\n".join(lineas))
@@ -577,6 +580,7 @@ def enviar_resumen_semanal(estado, ahora):
 
 PALABRAS_RESUMEN = ["resu", "resumen", "lista", "enviar", "envio", "precios", "precio", "prices", "summary"]
 
+# ─── MODIFICADO: CONTROLADOR PRINCIPAL CON PASADA ÚNICA ───────────────────────
 def main():
     ahora = datetime.now(timezone.utc)
     hora_utc = ahora.hour
@@ -588,23 +592,33 @@ def main():
     accion = os.environ.get("INPUT_ACCION", "").lower().strip()
     resumen_forzado = accion in PALABRAS_RESUMEN
 
+    # 🚀 [PASADA ÚNICA]: Consultamos Eneba UNA SOLA VEZ al principio del script
+    todos_resultados = {}
+    print("🚀 Iniciando escaneo único de mercados en Eneba...")
+    for moneda, config in MONEDAS.items():
+        print(f"  Obteniendo {moneda}...")
+        todos_resultados[moneda] = get_ratios_moneda(config, estado, ahora)
+
+    # Si se pulsa el botón manual, procesa el resumen con los datos frescos y corta ejecución
     if resumen_forzado:
         print(f"Resumen forzado por acción: {accion}")
-        enviar_resumen_diario(estado, ahora, tipos_cambio)
+        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados)
         guardar_estado(estado)
         return
 
+    # Turno del informe semanal (Solo lee el historial de GitHub, no consume red)
     if es_lunes and hora_utc >= 9 and debe_enviar_resumen("semanal", estado, ahora):
         print("Enviando resumen semanal...")
         enviar_resumen_semanal(estado, ahora)
 
+    # Turno del informe diario: Usa los datos guardados en memoria, tardando 0 segundos adicionales
     if hora_utc >= 9 and debe_enviar_resumen("diario", estado, ahora):
         print("Enviando resumen diario...")
-        enviar_resumen_diario(estado, ahora, tipos_cambio)
+        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados)
 
+    # Bucle de evaluación de alertas e historial usando los datos ya cacheados
     for moneda, config in MONEDAS.items():
-        print(f"\nComprobando {moneda}...")
-        resultados = get_ratios_moneda(config, estado, ahora)
+        resultados = todos_resultados[moneda]
         procesar_alertas(moneda, config, resultados, estado, tipos_cambio)
         guardar_historial(moneda, resultados, estado, ahora)
 
