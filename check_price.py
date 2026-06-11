@@ -135,7 +135,6 @@ MONEDAS = {
 }
 
 # ─── IMPORTS ──────────────────────────────────────────────────────────────────
-# (Todos tus imports originales intactos)
 import os
 import json
 import time
@@ -474,11 +473,13 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
 
     estado["monedas"][moneda] = estado_moneda
 
+# ─── MODIFICADO: REDUCCIÓN DE HISTORIAL Y LOG MENSUAL AUTOMÁTICO EN GITHUB ───
 def guardar_historial(moneda, resultados, estado, ahora):
     con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
     if not con_stock:
         return
     mejor = max(con_stock, key=lambda x: x["ratio"])
+    
     estado["historial"].append({
         "moneda": moneda,
         "timestamp": ahora.isoformat(),
@@ -486,20 +487,50 @@ def guardar_historial(moneda, resultados, estado, ahora):
         "mejor_valor": mejor["valor"],
         "mejor_precio_eur": round(mejor["precio_eur"], 4),
     })
-    limite = (ahora - timedelta(days=180)).isoformat()
-    historial_previo = list(estado["historial"])
-    estado["historial"] = [h for h in estado["historial"] if h["timestamp"] >= limite]
-    if len(estado["historial"]) < len(historial_previo):
-        exportar_historial_csv(historial_previo, ahora)
+    
+    # ⏱️ Mantener estado.json súper ligero: Solo guardamos los últimos 30 días en caliente
+    limite_caliente = (ahora - timedelta(days=30)).isoformat()
+    entradas_viejas = [h for h in estado["historial"] if h["timestamp"] < limite_caliente]
+    
+    if entradas_viejas:
+        # Enviar de forma silenciosa lo viejo al archivo mensual basándose en la fecha del dato
+        fecha_datos = datetime.fromisoformat(entradas_viejas[0]["timestamp"])
+        archivar_en_log_mensual(entradas_viejas, fecha_datos)
+        # Dejar únicamente lo nuevo (últimos 30 días) en el JSON principal de ejecución
+        estado["historial"] = [h for h in estado["historial"] if h["timestamp"] >= limite_caliente]
 
-def exportar_historial_csv(historial, ahora):
-    output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=["moneda", "timestamp", "mejor_ratio", "mejor_valor", "mejor_precio_eur"])
-    writer.writeheader()
-    writer.writerows(historial)
-    contenido = output.getvalue().encode("utf-8")
-    nombre = f"historial_eneba_{ahora.strftime('%Y%m%d')}.csv"
-    send_telegram_file(nombre, contenido, f"📦 Historial archivado — {ahora.strftime('%d/%m/%Y')}")
+def archivar_en_log_mensual(entradas, fecha_archivo):
+    """Guarda los registros antiguos en un archivo JSON independiente por Año_Mes en GitHub"""
+    nombre_archivo_mes = f"historial_{fecha_archivo.strftime('%Y_%m')}.json"
+    url_gh = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{nombre_archivo_mes}"
+    
+    datos_archivo = []
+    sha_archivo = None
+    
+    # 1. Intentar descargar el archivo mensual si ya existe en el repositorio
+    res = requests.get(url_gh, headers=GITHUB_HEADERS, timeout=10)
+    if res.status_code == 200:
+        res_json = res.json()
+        sha_archivo = res_json.get("sha")
+        datos_archivo = json.loads(base64.b64decode(res_json["content"]).decode("utf-8"))
+    
+    # 2. Unir registros evitando duplicados basándonos en moneda y marca de tiempo exacta
+    timestamps_existentes = {(d["moneda"], d["timestamp"]) for d in datos_archivo}
+    for e in entradas:
+        if (e["moneda"], e["timestamp"]) not in timestamps_existentes:
+            datos_archivo.append(e)
+            
+    # 3. Guardar de nuevo la actualización del mes en tu repositorio de GitHub
+    contenido = json.dumps(datos_archivo, indent=2).encode("utf-8")
+    body = {
+        "message": f"Archivar registros antiguos en {nombre_archivo_mes}",
+        "content": base64.b64encode(contenido).decode("utf-8")
+    }
+    if sha_archivo: 
+        body["sha"] = sha_archivo
+        
+    requests.put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
+    print(f"Archivadas {len(entradas)} entradas viejas en {nombre_archivo_mes} 📦")
 
 def debe_enviar_resumen(tipo, estado, ahora):
     ultimo = estado.get("resumenes", {}).get(f"ultimo_{tipo}")
@@ -513,7 +544,6 @@ def marcar_resumen_enviado(tipo, estado, ahora):
     if "resumenes" not in estado:
         estado["resumenes"] = {}
     if tipo == "diario":
-        estado["resumenes"]["ultimo_diario"] = Scientific notation or formatting for text string format.strftime("%Y-%m-%d")
         estado["resumenes"]["ultimo_diario"] = ahora.strftime("%Y-%m-%d")
     elif tipo == "semanal":
         estado["resumenes"]["ultimo_semanal"] = f"{ahora.isocalendar()[0]}-W{ahora.isocalendar()[1]}"
