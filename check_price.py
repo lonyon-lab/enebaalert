@@ -340,54 +340,86 @@ def cargar_estado():
     return {"monedas": {}, "historial": [], "resumenes": {}, "stock": {}, "sha_error_alertado": False, "ultimos_tipos_cambio": {}}
 
 def guardar_estado(estado):
-    # Punto 1: Manejar condición de carrera con reintentos ante 409 Conflict
-    for intento_guardado in range(3):
+    # Punto 1: Fusión inteligente con reintentos ante 409 Conflict (condición de carrera)
+    # En cada intento se lee el estado remoto actual, se fusiona con el local y se reintenta.
+    for intento in range(3):
         try:
+            # 1. Leer estado remoto actual y obtener su sha
             r = safe_get(
                 f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
                 headers=GITHUB_HEADERS,
                 timeout=10
             )
             sha = None
+            remoto = {}
             if r and r.status_code == 200:
-                res_json = r.json()
-                sha = res_json.get("sha")
-                try:
-                    contenido_previo = json.loads(base64.b64decode(res_json["content"]).decode("utf-8"))
-                    historial_viejo = len(contenido_previo.get("historial", []))
-                    historial_nuevo = len(estado.get("historial", []))
-                    if historial_viejo > 0 and historial_nuevo == 0:
-                        print("🛑 ABORTO DE SEGURIDAD: El historial se ha vaciado a 0 inesperadamente.")
-                        return
-                except Exception:
-                    pass
+                sha = r.json()["sha"]
+                remoto = json.loads(base64.b64decode(r.json()["content"]).decode("utf-8"))
 
+            # 🛑 ABORTO DE SEGURIDAD: El historial se ha vaciado a 0 inesperadamente
+            historial_viejo = len(remoto.get("historial", []))
+            historial_nuevo = len(estado.get("historial", []))
+            if historial_viejo > 0 and historial_nuevo == 0:
+                print("🛑 ABORTO DE SEGURIDAD: El historial se ha vaciado a 0 inesperadamente.")
+                return
+
+            # 2. Fusionar si existe estado remoto (previene pérdida de datos en conflictos)
+            if remoto:
+                # --- Historial: unión sin duplicados por (moneda, timestamp) ---
+                claves_locales = {(e["moneda"], e["timestamp"]) for e in estado.get("historial", [])}
+                for e in remoto.get("historial", []):
+                    if (e["moneda"], e["timestamp"]) not in claves_locales:
+                        estado["historial"].append(e)
+
+                # --- Stock: gana el que tenga ultima_comprobacion más reciente ---
+                for slug, info_rem in remoto.get("stock", {}).items():
+                    if slug not in estado.get("stock", {}):
+                        estado["stock"][slug] = info_rem
+                    else:
+                        ts_loc = estado["stock"][slug].get("ultima_comprobacion", "")
+                        ts_rem = info_rem.get("ultima_comprobacion", "")
+                        if ts_rem > ts_loc:
+                            estado["stock"][slug] = info_rem
+
+                # --- monedas, resumenes, sha_error_alertado, ultimos_tipos_cambio ---
+                # Se mantiene el estado local (lo que esta ejecución ha calculado)
+                # porque representa la información más reciente.
+
+            # 3. Preparar y enviar el estado fusionado
             contenido = json.dumps(estado, indent=2).encode("utf-8")
             contenido_b64 = base64.b64encode(contenido).decode("utf-8")
-            
+
             body = {
                 "message": "Actualizar estado",
                 "content": contenido_b64,
             }
             if sha:
                 body["sha"] = sha
+
             res_put = safe_put(
                 f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
                 headers=GITHUB_HEADERS,
                 json=body,
                 timeout=10
             )
-            if res_put and res_put.status_code == 409:
-                # 409 Conflict: otro proceso modificó el archivo, releer y reintentar
-                print(f"⚠️ Conflicto 409 al guardar estado (intento {intento_guardado+1}/3), releyendo...")
-                time.sleep(2)
+
+            # 4. Evaluar respuesta
+            if res_put and res_put.status_code in (200, 201):
+                print("Estado guardado en GitHub ✅")
+                return
+            elif res_put and res_put.status_code == 409:
+                print(f"⚠️ Conflicto 409 (intento {intento+1}/3), recargando y fusionando...")
+                time.sleep(1)
                 continue
-            print("Estado guardado en GitHub ✅")
-            return
+            else:
+                print(f"❌ Error inesperado al guardar: {res_put.status_code if res_put else 'sin respuesta'}")
+                return
+
         except Exception as e:
             print(f"Error guardando estado: {e}")
             return
-    print("❌ No se pudo guardar el estado tras 3 intentos por conflictos 409.")
+
+    print("❌ No se pudo guardar el estado tras 3 intentos por conflictos.")
 
 def debe_comprobar_slug(slug, estado, ahora):
     info = estado.get("stock", {}).get(slug)
