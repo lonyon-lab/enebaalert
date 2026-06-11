@@ -340,4 +340,298 @@ def debe_comprobar_slug(slug, estado, ahora):
     ultima = info.get("ultima_comprobacion")
     if not ultima:
         return True
-    diff = ahora
+    diff = ahora - datetime.fromisoformat(ultima)
+    return diff >= timedelta(hours=HORAS_RECHECK_SIN_STOCK)
+
+def actualizar_stock_slug(slug, tiene_stock, ahora, estado):
+    if "stock" not in estado:
+        estado["stock"] = {}
+    estado["stock"][slug] = {
+        "tiene_stock": tiene_stock,
+        "ultima_comprobacion": ahora.isoformat()
+    }
+
+def get_ratios_moneda(config, estado, ahora):
+    resultados = []
+    for item in config["slugs"]:
+        slug = item["slug"]
+        valor = item["valor"]
+
+        if not debe_comprobar_slug(slug, estado, ahora):
+            print(f"  {valor} = ⚫ Sin stock (sin recomprobar todavía)")
+            resultados.append({"valor": valor, "precio_eur": None, "ratio": None, "stock": "sin_stock"})
+            continue
+
+        price_cents, estado_slug = get_price(slug, estado)
+
+        if estado_slug == "api_error":
+            print(f"  {valor} = ⚠️ Error API (estado sin cambios)")
+            resultados.append({"valor": valor, "precio_eur": None, "ratio": None, "stock": "api_error"})
+            continue
+
+        if estado_slug == "sha_error":
+            print(f"  {valor} = ⚠️ SHA inválido")
+            resultados.append({"valor": valor, "precio_eur": None, "ratio": None, "stock": "sha_error"})
+            continue
+
+        if estado_slug == "ok":
+            actualizar_stock_slug(slug, True, ahora, estado)
+            price_eur = price_cents / 100
+            ratio = valor / price_eur
+            resultados.append({"valor": valor, "precio_eur": price_eur, "ratio": ratio, "stock": "ok"})
+            print(f"  {valor} = {price_eur:.2f}€ → {ratio:.2f}/€")
+        else:
+            actualizar_stock_slug(slug, False, ahora, estado)
+            resultados.append({"valor": valor, "precio_eur": None, "ratio": None, "stock": "sin_stock"})
+            print(f"  {valor} = ⚫ Sin stock")
+
+        time.sleep(0.5)
+    return resultados
+
+def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
+    con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
+    hay_api_error = any(r["stock"] in ("api_error", "sha_error") for r in resultados)
+    sin_stock_confirmado = all(r["stock"] == "sin_stock" for r in resultados)
+
+    estado_moneda = estado["monedas"].get(moneda, {
+        "ultimo_ratio_alertado": None,
+        "sobre_umbral": False,
+        "bajo_umbral_bajo": False,
+        "sin_datos_alertado": False,
+        "api_error_alertado": False,
+    })
+
+    if not con_stock:
+        if hay_api_error:
+            if not estado_moneda.get("api_error_alertado"):
+                send_telegram(f"⚠️ <b>API no disponible: {config['bandera']} {moneda}</b>")
+                estado_moneda["api_error_alertado"] = True
+        elif sin_stock_confirmado:
+            estado_moneda["api_error_alertado"] = False
+            if not estado_moneda.get("sin_datos_alertado"):
+                send_telegram(f"⚠️ <b>Sin stock: {config['bandera']} {moneda}</b>")
+                estado_moneda["sin_datos_alertado"] = True
+        estado["monedas"][moneda] = estado_moneda
+        return
+
+    estado_moneda["sin_datos_alertado"] = False
+    estado_moneda["api_error_alertado"] = False
+
+    mejor = max(con_stock, key=lambda x: x["ratio"])
+    mejor_ratio = mejor["ratio"]
+    tipo_cambio = tipos_cambio.get(moneda)
+
+    if not tipo_cambio:
+        return  # Sin cambio del banco en vivo, abortamos evaluación dinámica
+
+    # 🧠 CÁLCULO DINÁMICO RESTRINGIDO DE UMBRALES
+    umbral_compra = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
+    umbral_atraco = tipo_cambio * MARGEN_ALTO_ATRACO
+
+    margen = ((mejor_ratio / tipo_cambio) - 1) * 100
+    signo = "+" if margen >= 0 else ""
+    comparativa = f"\n💱 Cambio real: {tipo_cambio:.2f} {moneda}/€ ({signo}{margen:.1f}% vs mercado)"
+
+    # Alerta de precio inflado (Atraco en el mercado gris)
+    if mejor_ratio < umbral_atraco and not estado_moneda.get("bajo_umbral_bajo"):
+        send_telegram(
+            f"📉 <b>Precio inflado {config['bandera']} {moneda}</b>\n"
+            f"Tarjeta: <b>{mejor['valor']} {moneda}</b> por <b>{mejor['precio_eur']:.2f}€</b>\n"
+            f"Ratio actual: {mejor_ratio:.2f} {moneda}/€{comparativa}"
+        )
+        estado_moneda["bajo_umbral_bajo"] = True
+    elif mejor_ratio >= umbral_atraco:
+        estado_moneda["bajo_umbral_bajo"] = False
+
+    # Alerta de Arbitraje Real (Compra rentable blindada)
+    if mejor_ratio >= umbral_compra:
+        ultimo = estado_moneda.get("ultimo_ratio_alertado")
+        debe_alertar = False
+        if not estado_moneda.get("sobre_umbral"):
+            debe_alertar = True
+        elif ultimo is not None and mejor_ratio > ultimo + 0.5:
+            debe_alertar = True
+
+        if debe_alertar:
+            # Detectar empates de ratio maximo (Soporte multi-copa en alertas)
+            empates = [r for r in con_stock if round(r["ratio"], 2) == round(mejor_ratio, 2)]
+            if len(empates) == 1:
+                txt_tarjeta = f"Tarjeta: {empates[0]['valor']} {moneda} por {empates[0]['precio_eur']:.2f}€"
+            else:
+                txt_tarjeta = "Tarjetas en empate:\n" + "\n".join([f"  • {t['valor']} {moneda} por {t['precio_eur']:.2f}€" for t in empates])
+
+            send_telegram(
+                f"🚨 <b>¡Arbitraje Cazado! {config['bandera']} {moneda}</b>\n"
+                f"Mejor ratio: <b>{mejor_ratio:.2f} {moneda}/€</b> (Objetivo: >={umbral_compra:.2f})\n"
+                f"{txt_tarjeta}"
+                f"{comparativa}"
+            )
+            estado_moneda["ultimo_ratio_alertado"] = mejor_ratio
+            estado_moneda["sobre_umbral"] = True
+    else:
+        estado_moneda["sobre_umbral"] = False
+        estado_moneda["ultimo_ratio_alertado"] = None
+
+    estado["monedas"][moneda] = estado_moneda
+
+def guardar_historial(moneda, resultados, estado, ahora):
+    con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
+    if not con_stock:
+        return
+    mejor = max(con_stock, key=lambda x: x["ratio"])
+    estado["historial"].append({
+        "moneda": moneda,
+        "timestamp": ahora.isoformat(),
+        "mejor_ratio": round(mejor["ratio"], 2),
+        "mejor_valor": mejor["valor"],
+        "mejor_precio_eur": round(mejor["precio_eur"], 4),
+    })
+    limite = (ahora - timedelta(days=180)).isoformat()
+    historial_previo = list(estado["historial"])
+    estado["historial"] = [h for h in estado["historial"] if h["timestamp"] >= limite]
+    if len(estado["historial"]) < len(historial_previo):
+        exportar_historial_csv(historial_previo, ahora)
+
+def exportar_historial_csv(historial, ahora):
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=["moneda", "timestamp", "mejor_ratio", "mejor_valor", "mejor_precio_eur"])
+    writer.writeheader()
+    writer.writerows(historial)
+    contenido = output.getvalue().encode("utf-8")
+    nombre = f"historial_eneba_{ahora.strftime('%Y%m%d')}.csv"
+    send_telegram_file(nombre, contenido, f"📦 Historial archivado — {ahora.strftime('%d/%m/%Y')}")
+
+def debe_enviar_resumen(tipo, estado, ahora):
+    ultimo = estado.get("resumenes", {}).get(f"ultimo_{tipo}")
+    if tipo == "diario":
+        return ultimo != ahora.strftime("%Y-%m-%d")
+    elif tipo == "semanal":
+        return ultimo != f"{ahora.isocalendar()[0]}-W{ahora.isocalendar()[1]}"
+    return False
+
+def marcar_resumen_enviado(tipo, estado, ahora):
+    if "resumenes" not in estado:
+        estado["resumenes"] = {}
+    if tipo == "diario":
+        estado["resumenes"]["ultimo_diario"] = Scientific notation or formatting for text string format.strftime("%Y-%m-%d")
+        estado["resumenes"]["ultimo_diario"] = ahora.strftime("%Y-%m-%d")
+    elif tipo == "semanal":
+        estado["resumenes"]["ultimo_semanal"] = f"{ahora.isocalendar()[0]}-W{ahora.isocalendar()[1]}"
+
+def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
+    con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
+    lineas = [f"{config['bandera']} <b>{moneda}</b>"]
+
+    if not con_stock:
+        for r in resultados:
+            if r["stock"] == "api_error":
+                lineas.append(f"  {r['valor']} {moneda} → ⚠️ API no disponible")
+            else:
+                lineas.append(f"  {r['valor']} {moneda} → ⚫ Sin stock")
+        lineas.append("")
+        return lineas
+
+    mejor_ratio = max(r["ratio"] for r in con_stock)
+
+    for r in resultados:
+        if r["stock"] == "api_error":
+            lineas.append(f"  {r['valor']} {moneda} → ⚠️ API no disponible")
+        elif r["stock"] != "ok":
+            lineas.append(f"  {r['valor']} {moneda} → ⚫ Sin stock")
+        elif round(r["ratio"], 2) == round(mejor_ratio, 2):  # Soporte multi-copa si empatan ratios
+            lineas.append(f"  🏆 <b>{r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€</b>")
+        else:
+            lineas.append(f"  {r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€")
+
+    if tipo_cambio:
+        objetivo_hoy = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
+        lineas.append(f"  (Objetivo compra hoy: >{objetivo_hoy:.2f})")
+        mejor = max(con_stock, key=lambda x: x["ratio"])
+        margen = ((mejor['ratio'] / tipo_cambio) - 1) * 100
+        signo = "+" if margen >= 0 else ""
+        lineas.append(f"  💱 Cambio real: {tipo_cambio:.2f} {moneda}/€ ({signo}{margen:.1f}%)")
+
+    lineas.append("")
+    return lineas
+
+# ─── MODIFICADO: ACEPTA LOS RESULTADOS YA DESCARGADOS ─────────────────────────
+def enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados):
+    lineas = [f"📊 <b>Resumen diario Eneba — {ahora.strftime('%d/%m/%Y')}</b>\n"]
+    for moneda, config in MONEDAS.items():
+        # En vez de llamar a la API otra vez, recuperamos los datos en caché de la Pasada Única
+        resultados = todos_resultados.get(moneda, [])
+        tipo_cambio = tipos_cambio.get(moneda)
+        lineas += formatear_bloque_moneda(moneda, config, resultados, tipo_cambio)
+    send_telegram("\n".join(lineas))
+    marcar_resumen_enviado("diario", estado, ahora)
+
+def enviar_resumen_semanal(estado, ahora):
+    lineas = [f"📈 <b>Resumen semanal Eneba — semana {ahora.isocalendar()[1]}</b>\n"]
+    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    for moneda in MONEDAS:
+        config = MONEDAS[moneda]
+        una_semana = (ahora - timedelta(days=7)).isoformat()
+        semana = [h for h in estado["historial"] if h["moneda"] == moneda and h["timestamp"] >= una_semana]
+        if not semana:
+            lineas.append(f"{config['bandera']} <b>{moneda}</b>: sin datos esta semana\n")
+            continue
+        mejor = max(semana, key=lambda x: x["mejor_ratio"])
+        peor = min(semana, key=lambda x: x["mejor_ratio"])
+        mejor_dt = datetime.fromisoformat(mejor["timestamp"])
+        peor_dt = datetime.fromisoformat(peor["timestamp"])
+        lineas.append(f"{config['bandera']} <b>{moneda}</b>")
+        lineas.append(f"  🏆 Mejor: {mejor['mejor_ratio']:.2f} {moneda}/€")
+        lineas.append(f"     {dias[mejor_dt.weekday()]} {mejor_dt.strftime('%d/%m')} a las {mejor_dt.strftime('%H:%M')} ({mejor['mejor_valor']} {moneda} por {mejor['mejor_precio_eur']:.2f}€)")
+        lineas.append(f"  📉 Peor: {peor['mejor_ratio']:.2f} {moneda}/€")
+        lineas.append(f"     {dias[peor_dt.weekday()]} {peor_dt.strftime('%d/%m')} a las {peor_dt.strftime('%H:%M')}\n")
+    send_telegram("\n".join(lineas))
+    marcar_resumen_enviado("semanal", estado, ahora)
+
+PALABRAS_RESUMEN = ["resu", "resumen", "lista", "enviar", "envio", "precios", "precio", "prices", "summary"]
+
+# ─── MODIFICADO: CONTROLADOR PRINCIPAL CON PASADA ÚNICA ───────────────────────
+def main():
+    ahora = datetime.now(timezone.utc)
+    hora_utc = ahora.hour
+    es_lunes = ahora.weekday() == 0
+
+    estado = cargar_estado()
+    tipos_cambio = get_tipo_cambio_real(list(MONEDAS.keys()))
+
+    accion = os.environ.get("INPUT_ACCION", "").lower().strip()
+    resumen_forzado = accion in PALABRAS_RESUMEN
+
+    # 🚀 [PASADA ÚNICA]: Consultamos Eneba UNA SOLA VEZ al principio del script
+    todos_resultados = {}
+    print("🚀 Iniciando escaneo único de mercados en Eneba...")
+    for moneda, config in MONEDAS.items():
+        print(f"  Obteniendo {moneda}...")
+        todos_resultados[moneda] = get_ratios_moneda(config, estado, ahora)
+
+    # Si se pulsa el botón manual, procesa el resumen con los datos frescos y corta ejecución
+    if resumen_forzado:
+        print(f"Resumen forzado por acción: {accion}")
+        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados)
+        guardar_estado(estado)
+        return
+
+    # Turno del informe semanal (Solo lee el historial de GitHub, no consume red)
+    if es_lunes and hora_utc >= 9 and debe_enviar_resumen("semanal", estado, ahora):
+        print("Enviando resumen semanal...")
+        enviar_resumen_semanal(estado, ahora)
+
+    # Turno del informe diario: Usa los datos guardados en memoria, tardando 0 segundos adicionales
+    if hora_utc >= 9 and debe_enviar_resumen("diario", estado, ahora):
+        print("Enviando resumen diario...")
+        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados)
+
+    # Bucle de evaluación de alertas e historial usando los datos ya cacheados
+    for moneda, config in MONEDAS.items():
+        resultados = todos_resultados[moneda]
+        procesar_alertas(moneda, config, resultados, estado, tipos_cambio)
+        guardar_historial(moneda, resultados, estado, ahora)
+
+    guardar_estado(estado)
+
+if __name__ == "__main__":
+    main()
