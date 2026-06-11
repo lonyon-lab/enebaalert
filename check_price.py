@@ -144,6 +144,7 @@ import base64
 import requests
 import random
 from datetime import datetime, timezone, timedelta
+from collections import defaultdict
 
 # ─── SESIÓN PERSISTENTE (MEJORA ANTI-BAN) ─────────────────────────────────────
 session = requests.Session()
@@ -175,10 +176,44 @@ session.headers.update(HEADERS)
 
 HORAS_RECHECK_SIN_STOCK = 2
 
+# ─── FUNCIONES CON REINTENTOS (SAFE_GET / SAFE_POST) ─────────────────────────
+def safe_get(url, **kwargs):
+    for intento in range(3):
+        try:
+            resp = session.get(url, timeout=kwargs.get("timeout", 10), headers=kwargs.get("headers"), params=kwargs.get("params"))
+            if resp.status_code < 500:  # Errores 4xx no reintentamos
+                return resp
+            time.sleep(1 * (intento + 1))
+        except Exception:
+            time.sleep(1 * (intento + 1))
+    return None
+
+def safe_post(url, **kwargs):
+    for intento in range(3):
+        try:
+            resp = session.post(url, timeout=kwargs.get("timeout", 10), json=kwargs.get("json"), headers=kwargs.get("headers"))
+            if resp.status_code < 500:
+                return resp
+            time.sleep(1 * (intento + 1))
+        except Exception:
+            time.sleep(1 * (intento + 1))
+    return None
+
+def safe_put(url, **kwargs):
+    for intento in range(3):
+        try:
+            resp = session.put(url, timeout=kwargs.get("timeout", 10), json=kwargs.get("json"), headers=kwargs.get("headers"))
+            if resp.status_code < 500:
+                return resp
+            time.sleep(1 * (intento + 1))
+        except Exception:
+            time.sleep(1 * (intento + 1))
+    return None
+
 # ─── FUNCIONES ORIGINALES DE TELEGRAM, API Y GITHUB ───────────────────────────
 def send_telegram(msg):
     try:
-        session.get(
+        safe_get(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
             params={"chat_id": CHAT_ID, "text": msg, "parse_mode": "HTML"},
             timeout=10
@@ -197,18 +232,21 @@ def send_telegram_file(filename, content, caption=""):
     except Exception as e:
         print(f"Error enviando archivo Telegram: {e}")
 
-def get_tipo_cambio_real(monedas):
+# --- Fallback de tipo de cambio ---
+def get_tipo_cambio_real(monedas, estado):
+    # Intentar obtener tipo de cambio actual
     try:
-        r = session.get(
-            "https://open.er-api.com/v6/latest/EUR",
-            timeout=5
-        )
-        if r.status_code == 200:
+        r = safe_get("https://open.er-api.com/v6/latest/EUR", timeout=5)
+        if r and r.status_code == 200:
             rates = r.json().get("rates", {})
-            return {m: rates[m] for m in monedas if m in rates}
+            nuevos = {m: rates[m] for m in monedas if m in rates}
+            # Guardar como fallback en estado
+            estado["ultimos_tipos_cambio"] = nuevos
+            return nuevos
     except Exception:
         pass
-    return {}
+    # Devolver última tasa guardada (fallback)
+    return estado.get("ultimos_tipos_cambio", {})
 
 def get_price(slug, estado):
     body = {
@@ -230,13 +268,13 @@ def get_price(slug, estado):
         }
     }
     try:
-        r = session.post(
+        r = safe_post(
             "https://graphql.eneba.com/graphql/",
             json=body,
             timeout=10
         )
-        if r.status_code != 200:
-            print(f"❌ Error de red o API caída (status {r.status_code})")
+        if not r or r.status_code != 200:
+            print(f"❌ Error de red o API caída (status {r.status_code if r else 'no response'})")
             return None, "api_error"
 
         data = r.json()
@@ -283,27 +321,27 @@ def get_price(slug, estado):
 
 def cargar_estado():
     try:
-        r = session.get(
+        r = safe_get(
             f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
             headers=GITHUB_HEADERS,
             timeout=10
         )
-        if r.status_code == 200:
+        if r and r.status_code == 200:
             contenido = base64.b64decode(r.json()["content"]).decode("utf-8")
             return json.loads(contenido)
     except Exception as e:
         print(f"Error cargando estado: {e}")
-    return {"monedas": {}, "historial": [], "resumenes": {}, "stock": {}, "sha_error_alertado": False}
+    return {"monedas": {}, "historial": [], "resumenes": {}, "stock": {}, "sha_error_alertado": False, "ultimos_tipos_cambio": {}}
 
 def guardar_estado(estado):
     try:
-        r = session.get(
+        r = safe_get(
             f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
             headers=GITHUB_HEADERS,
             timeout=10
         )
         sha = None
-        if r.status_code == 200:
+        if r and r.status_code == 200:
             res_json = r.json()
             sha = res_json.get("sha")
             try:
@@ -325,7 +363,7 @@ def guardar_estado(estado):
         }
         if sha:
             body["sha"] = sha
-        session.put(
+        safe_put(
             f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE}",
             headers=GITHUB_HEADERS,
             json=body,
@@ -344,8 +382,11 @@ def debe_comprobar_slug(slug, estado, ahora):
     ultima = info.get("ultima_comprobacion")
     if not ultima:
         return True
-    diff = ahora - datetime.fromisoformat(ultima)
-    return diff >= timedelta(hours=HORAS_RECHECK_SIN_STOCK)
+    try:
+        diff = ahora - datetime.fromisoformat(ultima)
+        return diff >= timedelta(hours=HORAS_RECHECK_SIN_STOCK)
+    except Exception:
+        return True
 
 def actualizar_stock_slug(slug, tiene_stock, ahora, estado):
     if "stock" not in estado:
@@ -389,8 +430,8 @@ def get_ratios_moneda(config, estado, ahora):
             resultados.append({"valor": valor, "precio_eur": None, "ratio": None, "stock": "sin_stock"})
             print(f"  {valor} = ⚫ Sin stock")
 
-        # JITTER: Pausa aleatoria para evitar detección de bot
-        time.sleep(random.uniform(0.8, 1.8))
+        # JITTER: Pausa aleatoria para evitar detección de bot (valor reducido)
+        time.sleep(random.uniform(0.3, 0.7))
     return resultados
 
 def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
@@ -499,10 +540,18 @@ def guardar_historial(moneda, resultados, estado, ahora):
     entradas_viejas = [h for h in estado["historial"] if h["timestamp"] < limite_caliente]
     
     if entradas_viejas:
-        # Enviar de forma silenciosa lo viejo al archivo mensual basándose en la fecha del dato
-        fecha_datos = datetime.fromisoformat(entradas_viejas[0]["timestamp"])
-        archivar_en_log_mensual(entradas_viejas, fecha_datos)
-        # Dejar únicamente lo nuevo (últimos 30 días) en el JSON principal de ejecución
+        # Agrupar entradas viejas por mes real (basado en timestamp de cada registro)
+        entradas_por_mes = defaultdict(list)
+        for e in entradas_viejas:
+            # Extraer año-mes del timestamp (formato ISO: "2026-06-11T...")
+            mes_key = e["timestamp"][:7]  # "2026-06"
+            entradas_por_mes[mes_key].append(e)
+        
+        for mes_key, grupo in entradas_por_mes.items():
+            fecha_mes = datetime.strptime(mes_key, "%Y-%m")
+            archivar_en_log_mensual(grupo, fecha_mes)
+        
+        # Dejar únicamente lo nuevo (últimos 30 días) en el JSON principal
         estado["historial"] = [h for h in estado["historial"] if h["timestamp"] >= limite_caliente]
 
 def archivar_en_log_mensual(entradas, fecha_archivo):
@@ -514,18 +563,21 @@ def archivar_en_log_mensual(entradas, fecha_archivo):
     sha_archivo = None
     
     # 1. Intentar descargar el archivo mensual si ya existe en el repositorio
-    res = session.get(url_gh, headers=GITHUB_HEADERS, timeout=10)
-    if res.status_code == 200:
+    res = safe_get(url_gh, headers=GITHUB_HEADERS, timeout=10)
+    if res and res.status_code == 200:
         res_json = res.json()
         sha_archivo = res_json.get("sha")
-        datos_archivo = json.loads(base64.b64decode(res_json["content"]).decode("utf-8"))
+        try:
+            datos_archivo = json.loads(base64.b64decode(res_json["content"]).decode("utf-8"))
+        except Exception:
+            datos_archivo = []
     
     # 2. Unir registros evitando duplicados basándonos en moneda y marca de tiempo exacta
     timestamps_existentes = {(d["moneda"], d["timestamp"]) for d in datos_archivo}
     for e in entradas:
         if (e["moneda"], e["timestamp"]) not in timestamps_existentes:
             datos_archivo.append(e)
-            
+    
     # 3. Guardar de nuevo la actualización del mes en tu repositorio de GitHub
     contenido = json.dumps(datos_archivo, indent=2).encode("utf-8")
     body = {
@@ -534,8 +586,8 @@ def archivar_en_log_mensual(entradas, fecha_archivo):
     }
     if sha_archivo: 
         body["sha"] = sha_archivo
-        
-    session.put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
+    
+    safe_put(url_gh, headers=GITHUB_HEADERS, json=body, timeout=10)
     print(f"Archivadas {len(entradas)} entradas viejas en {nombre_archivo_mes} 📦")
 
 def debe_enviar_resumen(tipo, estado, ahora):
@@ -632,7 +684,7 @@ def main():
     es_lunes = ahora.weekday() == 0
 
     estado = cargar_estado()
-    tipos_cambio = get_tipo_cambio_real(list(MONEDAS.keys()))
+    tipos_cambio = get_tipo_cambio_real(list(MONEDAS.keys()), estado)
 
     accion = os.environ.get("INPUT_ACCION", "").lower().strip()
     resumen_forzado = accion in PALABRAS_RESUMEN
