@@ -6,7 +6,7 @@
 # Si escribes una coma en vez de un punto (ej. 52,5) el script lo corrige solo.
 # Si el valor no es un número válido, se ignora y se avisa por Telegram.
 
-TRY: null   # 🇹🇷 Ratio TRY/€ objetivo
+TRY: 52.30   # 🇹🇷 Ratio TRY/€ objetivo
 BRL: null   # 🇧🇷 Ratio BRL/€ objetivo
 CLP: null   # 🇨🇱 Ratio CLP/€ objetivo
 COP: null   # 🇨🇴 Ratio COP/€ objetivo
