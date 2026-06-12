@@ -1,8 +1,5 @@
 name: Alerta Eneba TRY
 on:
-  schedule:
-    - cron: '0 1,3,5,7 * * *'
-    - cron: '0,30 8-23 * * *'
   workflow_dispatch:
     inputs:
       accion:
