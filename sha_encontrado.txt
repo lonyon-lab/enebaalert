@@ -1,0 +1,63 @@
+=== RESULTADO EXTRACCIÓN SHA ENEBA ===
+Página analizada: https://www.eneba.com/es/xbox-xbox-live-gift-card-25-try-xbox-live-key-turkey
+Archivos JS encontrados en HTML: 79
+Bundles descargados correctamente: 79
+Candidatos con 'ProductNoCache': 0
+
+No se encontró ningún candidato.
+Posibles causas:
+- El SHA no está en archivos JS estáticos (se genera dinámicamente)
+- Los nombres de los bundles no coinciden con el patrón buscado
+- La página requiere JavaScript para cargar el contenido relevante
+
+--- URLs JS encontradas (para diagnóstico) ---
+  https://static.eneba.games/vendors.adc9e534782c7eafbcefa07a9fe969.75658bbe9f8cc2bc370c.bundle.js
+  https://static.eneba.games/vendors.31507eaa823ba1dba9f15f651c52fc.7ffb3a4a629ace92d684.bundle.js
+  https://static.eneba.games/vendors.60f18575141e05d86735f0a397c1ee.80e630a5acb37335c51c.bundle.js
+  https://static.eneba.games/479.15a0260adbc150463d0f.part.js
+  https://static.eneba.games/vendors.a3b4283cbe203b85279cd25f57bd93.3a5c752ebb163ab4387e.part.js
+  https://static.eneba.games/vendors.8d2cd68d525cb01552dd1b3dc69273.ae13dd68f82da6904bfd.bundle.js
+  https://static.eneba.games/vendors.c08f69fe204dcabed60b446ccbd6c1.0f64094aa23035c520ee.bundle.js
+  https://static.eneba.games/vendors.0bdc9e734f251b6f249814307e9d0e.12fb20a53c2777170199.bundle.js
+  https://static.eneba.games/vendors.ddc7ac163e35d2338dc0238c9c5110.147972440a034387b85a.bundle.js
+  https://static.eneba.games/vendors.b59db18d2bc55505974de931dd02ee.9c483fecc23f90c62c5a.bundle.js
+  https://static.eneba.games/vendors.edb29670c9b602fa063a4af5474e30.5969aa3c77a719b7b7ca.bundle.js
+  https://static.eneba.games/vendors.dbdfcbd9f324d9079ccda315565965.0f73da3e8dfbdec00cbd.bundle.js
+  https://static.eneba.games/vendors.e5c66962b418cb204ef3e39524268b.0f7e38c27faed5e9daad.bundle.js
+  https://static.eneba.games/vendors.6a5293351615f6bccd21d8e3b9c6d2.7c6bc3981fa72ee52dae.bundle.js
+  https://static.eneba.games/main.59d953fc9ab3faf5ff2a.bundle.js
+  https://static.eneba.games/vendors.d10156b4ca7555d6a072f0322874a5.bd5b3e314d68b7c74e43.bundle.js
+  https://static.eneba.games/vendors.0094a4d11808667f055f5ce7078f94.f4491d95532cc797dfaf.bundle.js
+  https://static.eneba.games/vendors.13151f94df9edba6cb5544d32ce87a.f9d25d2b26f05a951a7d.bundle.js
+  https://static.eneba.games/vendors.a34975a29095eff9f85d9c5a10ca6f.39f2fd2a6ad038595dc4.bundle.js
+  https://static.eneba.games/vendors.6fbeba8356101efa150fd8b8cf5ab5.fb298b46fd08dd543133.bundle.js
+  https://static.eneba.games/vendors.aa83d1b3231718024c4ed3c721e555.2b3895e06182aecb6c7f.part.js
+  https://static.eneba.games/vendors.3998a9d845a7bdf6ac1cd9d170172a.e3de0c4bdcf4f2a2a84d.part.js
+  https://static.eneba.games/outdated/index.js
+  https://static.eneba.games/vendors.895677c156297fd2b8e8821d646937.62d8e30519358a7403cc.bundle.js
+  https://static.eneba.games/vendors.7b281a509020eb304bfca88c7e8e91.05cf0d759b2d0fc30faf.bundle.js
+  https://static.eneba.games/vendors.d549b0b24b8897813b4fe2ea29f3fb.5d7cfbfc99b7797cc90b.bundle.js
+  https://static.eneba.games/vendors.05ded5b05988b42e1bf56761ef1e73.5e6e2e4e95a8581812b9.bundle.js
+  https://static.eneba.games/vendors.f2f69ffd70a45ebcfa39734af5bd5d.3f4b3260775980434605.bundle.js
+  https://static.eneba.games/vendors.1efad098ea1530cd7aafade0f7b632.4fe20244039a3700c18a.bundle.js
+  https://static.eneba.games/containers-ProductEntryPage.aa9cdd0efb89173169f7.part.js
+  https://static.eneba.games/vendors.d38711ed819408c502ec172e3759a0.035f051df6b3b7a2ef4f.part.js
+  https://static.eneba.games/vendors.5f7800a60e7fb1d88a380641788fdd.bc94eaa43c6ab0d27b1f.part.js
+  https://static.eneba.games/vendors.1d27957cd668257f4539e91b4247ef.20ea946b9795d4421e3e.bundle.js
+  https://static.eneba.games/vendors.854c847329bd13e1b24f71799e2ecd.b0fccd5d08975d708a5b.bundle.js
+  https://static.eneba.games/vendors.a832e7264e554fc5538e9c630edd73.a3874fe88be846f42946.bundle.js
+  https://static.eneba.games/vendors.e33ca0a509558caab68b42f328abe9.53116345951d3c3426af.bundle.js
+  https://static.eneba.games/vendors.a9dc3589b2341327b8894ecb3a09d3.d7689593b38e0080b39f.part.js
+  https://static.eneba.games/vendors.ebb0f7a865631839241b1eb4041730.2f9ba7da81b2c618837e.bundle.js
+  https://static.eneba.games/vendors.877fc37669cb9960b62ee3b97e9e47.87302ceec19bbacfd687.bundle.js
+  https://static.eneba.games/vendors.0f1f42b162a1e9ff64e2cfb7989afe.4b1536c04940aaac1e5f.bundle.js
+  https://static.eneba.games/vendors.3ba2081c7b6cab11a57d43475a0e8d.5038aa15ecd83715bb41.bundle.js
+  https://static.eneba.games/vendors.e04ff7c0e862ef625a9ca3a07707b4.01f9e3f53dcbc64f9662.bundle.js
+  https://static.eneba.games/vendors.b0520527274c6ad33b2f3e745149a8.8b7be9671eaf042bed2c.bundle.js
+  https://static.eneba.games/vendors.f72cc4528dfb3dc64303a005b18ace.e5b91c50fc0287ac0657.bundle.js
+  https://static.eneba.games/vendors.eeff6503137ed22fea865f0a1a4d79.20164aa95a907346be52.bundle.js
+  https://static.eneba.games/vendors.cb93912359c344966d5b2467a36dfb.0f1274e7e00ff6c866b2.bundle.js
+  https://static.eneba.games/vendors.d3e52473e8766b50872fdda7837462.9a069c272dcc88ae466a.bundle.js
+  https://static.eneba.games/runtime~main.864cdb96a2056fb3e182.bundle.js
+  https://static.eneba.games/vendors.d4b24cb8c4a0a500cff4d94b6f78a1.c86b703894571e4c6060.bundle.js
+  https://static.eneba.games/vendors.ae9cc15991766766a21bfcf789c2fb.1e636ef482843034ad13.bundle.js
