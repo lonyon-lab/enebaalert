@@ -1,0 +1,17 @@
+# ─── MÁRGENES MANUALES ──────────────────────────────────────────────────────
+# Si pones un número, esa moneda usará ESE ratio como objetivo directamente
+# (el mismo formato que ves en el bot, ej. 52.50 para TRY).
+# Pon "null" para volver al cálculo automático con margen dinámico.
+#
+# Si escribes una coma en vez de un punto (ej. 52,5) el script lo corrige solo.
+# Si el valor no es un número válido, se ignora y se avisa por Telegram.
+
+TRY: null   # 🇹🇷 Ratio TRY/€ objetivo
+BRL: null   # 🇧🇷 Ratio BRL/€ objetivo
+CLP: null   # 🇨🇱 Ratio CLP/€ objetivo
+COP: null   # 🇨🇴 Ratio COP/€ objetivo
+ZAR: null   # 🇿🇦 Ratio ZAR/€ objetivo
+SAR: null   # 🇸🇦 Ratio SAR/€ objetivo
+TWD: null   # 🇹🇼 Ratio TWD/€ objetivo
+HKD: null   # 🇭🇰 Ratio HKD/€ objetivo
+JPY: null   # 🇯🇵 Ratio JPY/€ objetivo
