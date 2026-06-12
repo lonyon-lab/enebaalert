@@ -273,57 +273,68 @@ def get_price(slug, estado):
             "persistedQuery": {"version": 1, "sha256Hash": SHA}
         }
     }
-    try:
-        r = safe_post(
-            "https://graphql.eneba.com/graphql/",
-            json=body,
-            timeout=10
-        )
-        if not r or r.status_code != 200:
-            print(f"❌ Error de red o API caída (status {r.status_code if r else 'no response'})")
-            return None, "api_error"
 
-        data = r.json()
+    # Confirmación de SHA inválido: reintentar varias veces con pausa antes de darlo
+    # por bueno, ya que Eneba a veces devuelve este error de forma puntual y transitoria.
+    INTENTOS_CONFIRMACION_SHA = 4
+    ESPERA_ENTRE_INTENTOS = 3  # segundos
 
-        if "errors" in data:
-            error_msg = str(data["errors"])
-            if "PersistedQueryNotFound" in error_msg or "Invalid extended query" in error_msg:
-                print(f"❌ SHA Inválido detectado.")
-                if not estado.get("sha_error_alertado", False):
-                    send_telegram(
-                        "⚠️ <b>SHA de Eneba ha cambiado o es inválido</b>\n"
-                        "La API ha respondido con errores de Query persistida."
-                    )
-                    estado["sha_error_alertado"] = True
-                return None, "sha_error"
-            else:
-                print(f"⚠️ Error GraphQL genérico: {error_msg}")
+    for intento_sha in range(INTENTOS_CONFIRMACION_SHA):
+        try:
+            r = safe_post(
+                "https://graphql.eneba.com/graphql/",
+                json=body,
+                timeout=10
+            )
+            if not r or r.status_code != 200:
+                print(f"❌ Error de red o API caída (status {r.status_code if r else 'no response'})")
                 return None, "api_error"
 
-        if estado.get("sha_error_alertado", False):
-            send_telegram("✅ <b>Tracker Recuperado:</b> El SHA de Eneba vuelve a funcionar de forma automática.")
-            estado["sha_error_alertado"] = False
-            
-        try:
-            edges = data["data"]["productNoCache"]["auctions"]["edges"]
-        except (KeyError, TypeError):
-            return None, "sin_stock"
-            
-        prices_con_stock = [
-            e["node"]["price"]["amount"]
-            for e in edges
-            if e["node"]["isInStock"]
-            and e["node"]["isCurrentlyAvailable"]
-            and e["node"]["price"]["amount"] > 0
-        ]
-        if prices_con_stock:
-            return min(prices_con_stock), "ok"
-        else:
-            return None, "sin_stock"
+            data = r.json()
 
-    except Exception as e:
-        print(f"Error de red en {slug}: {e}")
-        return None, "api_error"
+            if "errors" in data:
+                error_msg = str(data["errors"])
+                if "PersistedQueryNotFound" in error_msg or "Invalid extended query" in error_msg:
+                    if intento_sha < INTENTOS_CONFIRMACION_SHA - 1:
+                        print(f"⚠️ Posible SHA inválido (intento {intento_sha+1}/{INTENTOS_CONFIRMACION_SHA}), reintentando en {ESPERA_ENTRE_INTENTOS}s...")
+                        time.sleep(ESPERA_ENTRE_INTENTOS)
+                        continue
+                    print(f"❌ SHA Inválido confirmado tras {INTENTOS_CONFIRMACION_SHA} intentos.")
+                    if not estado.get("sha_error_alertado", False):
+                        send_telegram(
+                            "⚠️ <b>SHA de Eneba ha cambiado o es inválido</b>\n"
+                            "La API ha respondido con errores de Query persistida."
+                        )
+                        estado["sha_error_alertado"] = True
+                    return None, "sha_error"
+                else:
+                    print(f"⚠️ Error GraphQL genérico: {error_msg}")
+                    return None, "api_error"
+
+            if estado.get("sha_error_alertado", False):
+                send_telegram("✅ <b>Tracker Recuperado:</b> El SHA de Eneba vuelve a funcionar de forma automática.")
+                estado["sha_error_alertado"] = False
+
+            try:
+                edges = data["data"]["productNoCache"]["auctions"]["edges"]
+            except (KeyError, TypeError):
+                return None, "sin_stock"
+
+            prices_con_stock = [
+                e["node"]["price"]["amount"]
+                for e in edges
+                if e["node"]["isInStock"]
+                and e["node"]["isCurrentlyAvailable"]
+                and e["node"]["price"]["amount"] > 0
+            ]
+            if prices_con_stock:
+                return min(prices_con_stock), "ok"
+            else:
+                return None, "sin_stock"
+
+        except Exception as e:
+            print(f"Error de red en {slug}: {e}")
+            return None, "api_error"
 
 def cargar_estado():
     try:
