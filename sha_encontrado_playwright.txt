@@ -1,0 +1,11 @@
+=== RESULTADO EXTRACCIÓN SHA ENEBA (Playwright) ===
+Página analizada: https://www.eneba.com/es/xbox-xbox-live-gift-card-25-try-xbox-live-key-turkey
+Peticiones GraphQL con persistedQuery capturadas: 1
+
+--- PETICIONES CAPTURADAS ---
+
+#1 operationName: ProductNoCache
+   sha256Hash: c3aaf0194bab3a8481512069d9bbc707037714c0a60f603497bc820f00a91c11_50e5e0d9351bb05ab629b0eda9b116ae4d96fbb6861836383bc404f1ab5e3680094635224c07d364fff371b7517712ebd33ce0f05504f2fa7e9d66e321168e02
+
+--- SHA DE ProductNoCache ENCONTRADO ---
+c3aaf0194bab3a8481512069d9bbc707037714c0a60f603497bc820f00a91c11_50e5e0d9351bb05ab629b0eda9b116ae4d96fbb6861836383bc404f1ab5e3680094635224c07d364fff371b7517712ebd33ce0f05504f2fa7e9d66e321168e02
