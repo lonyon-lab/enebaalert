@@ -1,0 +1,39 @@
+name: Actualizar SHA de Eneba
+
+# Configuración para ejecutarlo manualmente
+on:
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: 'Ejecutar para obtener el nuevo SHA'
+        required: false
+        default: ''
+
+jobs:
+  update-sha:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurar Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3. Instalar requests (la librería que usa get_sha.py)
+      - name: Install dependencies
+        run: pip install requests
+
+      # 4. Ejecutar el script
+      - name: Run get_sha.py script
+        run: python get_sha.py
+
+      # 5. Guardar el resultado como un artefacto descargable
+      - name: Upload SHA file
+        uses: actions/upload-artifact@v4
+        with:
+          name: sha-resultado
+          path: sha.txt
