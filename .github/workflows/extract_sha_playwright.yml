@@ -1,0 +1,19 @@
+name: Extraer SHA Eneba con Playwright (experimento)
+on:
+  workflow_dispatch:
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencias
+        run: |
+          pip install playwright requests
+          playwright install --with-deps chromium
+      - name: Ejecutar script
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: python extract_sha_playwright.py
