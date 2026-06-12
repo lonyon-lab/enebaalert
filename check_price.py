@@ -143,11 +143,60 @@ import io
 import base64
 import requests
 import random
+import yaml
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
 # ─── SESIÓN PERSISTENTE (MEJORA ANTI-BAN) ─────────────────────────────────────
 session = requests.Session()
+
+# ─── MÁRGENES MANUALES (OPCIONAL) ─────────────────────────────────────────────
+# Carga margenes_manuales.yml si existe. Si no existe o está vacío, no afecta
+# al funcionamiento normal del script (todo sigue con cálculo automático).
+MARGENES_MANUALES = {}
+try:
+    with open("margenes_manuales.yml", "r", encoding="utf-8") as f:
+        contenido_yaml = yaml.safe_load(f)
+        if isinstance(contenido_yaml, dict):
+            MARGENES_MANUALES = contenido_yaml
+    print(f"✅ margenes_manuales.yml cargado: {MARGENES_MANUALES}")
+except FileNotFoundError:
+    print("ℹ️ No se encontró margenes_manuales.yml. Usando solo márgenes automáticos.")
+except Exception as e:
+    print(f"⚠️ Error al cargar margenes_manuales.yml: {e}")
+
+
+def obtener_margen_manual(moneda, estado):
+    """
+    Devuelve (valor_float, es_valido) para el ratio manual de una moneda.
+    - Si no hay valor manual (None o ausente) -> (None, True), se usará el automático.
+    - Si hay valor y es convertible a float (corrigiendo coma por punto) -> (valor, True).
+    - Si hay valor pero no es convertible -> (None, False), se avisa por Telegram una vez.
+    """
+    valor = MARGENES_MANUALES.get(moneda)
+    if valor is None:
+        return None, True
+
+    try:
+        if isinstance(valor, str):
+            valor = valor.replace(",", ".")
+        valor_float = float(valor)
+        # Si ahora es válido, limpiar el flag de aviso por si antes era inválido
+        if "margen_manual_invalido_alertado" in estado:
+            estado["margen_manual_invalido_alertado"].pop(moneda, None)
+        return valor_float, True
+    except (ValueError, TypeError):
+        # Aviso por Telegram una sola vez (anti-spam usando estado)
+        if "margen_manual_invalido_alertado" not in estado:
+            estado["margen_manual_invalido_alertado"] = {}
+        if not estado["margen_manual_invalido_alertado"].get(moneda):
+            send_telegram(
+                f"⚠️ <b>Valor manual inválido para {moneda}</b>\n"
+                f"El valor '{valor}' en margenes_manuales.yml no es un número válido.\n"
+                f"Se usará el cálculo automático mientras tanto."
+            )
+            estado["margen_manual_invalido_alertado"][moneda] = True
+        return None, False
 
 # ─── TELEGRAM ─────────────────────────────────────────────────────────────────
 TOKEN = os.environ["TELEGRAM_TOKEN"]
@@ -526,27 +575,41 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
     mejor_ratio = mejor["ratio"]
     tipo_cambio = tipos_cambio.get(moneda)
 
-    if not tipo_cambio:
-        return  # Sin cambio del banco en vivo, abortamos evaluación dinámica
+    # Mejora 1: margen manual (si existe y es válido, sobrescribe el cálculo dinámico)
+    margen_manual, _ = obtener_margen_manual(moneda, estado)
+    es_manual = margen_manual is not None
 
-    # 🧠 CÁLCULO DINÁMICO RESTRINGIDO DE UMBRALES
-    umbral_compra = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
-    umbral_atraco = tipo_cambio * MARGEN_ALTO_ATRACO
+    if not tipo_cambio and not es_manual:
+        return  # Sin cambio del banco en vivo y sin override manual, abortamos evaluación dinámica
 
-    margen = ((mejor_ratio / tipo_cambio) - 1) * 100
-    signo = "+" if margen >= 0 else ""
-    comparativa = f"\n💱 Cambio real: {tipo_cambio:.2f} {moneda}/€ ({signo}{margen:.1f}% vs mercado)"
+    # 🧠 CÁLCULO DINÁMICO RESTRINGIDO DE UMBRALES (o manual si está definido)
+    if es_manual:
+        umbral_compra = margen_manual
+    else:
+        umbral_compra = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
 
-    # Alerta de precio inflado (Atraco en el mercado gris)
-    if mejor_ratio < umbral_atraco and not estado_moneda.get("bajo_umbral_bajo"):
-        send_telegram(
-            f"📉 <b>Precio inflado {config['bandera']} {moneda}</b>\n"
-            f"Tarjeta: <b>{mejor['valor']} {moneda}</b> por <b>{mejor['precio_eur']:.2f}€</b>\n"
-            f"Ratio actual: {mejor_ratio:.2f} {moneda}/€{comparativa}"
-        )
-        estado_moneda["bajo_umbral_bajo"] = True
-    elif mejor_ratio >= umbral_atraco:
-        estado_moneda["bajo_umbral_bajo"] = False
+    indicador_manual = " 🔧 manual" if es_manual else ""
+
+    if tipo_cambio:
+        umbral_atraco = tipo_cambio * MARGEN_ALTO_ATRACO
+        margen = ((mejor_ratio / tipo_cambio) - 1) * 100
+        signo = "+" if margen >= 0 else ""
+        comparativa = f"\n💱 Cambio real: {tipo_cambio:.2f} {moneda}/€ ({signo}{margen:.1f}% vs mercado)"
+    else:
+        umbral_atraco = None
+        comparativa = ""
+
+    # Alerta de precio inflado (Atraco en el mercado gris) - solo si hay cambio real disponible
+    if umbral_atraco is not None:
+        if mejor_ratio < umbral_atraco and not estado_moneda.get("bajo_umbral_bajo"):
+            send_telegram(
+                f"📉 <b>Precio inflado {config['bandera']} {moneda}</b>\n"
+                f"Tarjeta: <b>{mejor['valor']} {moneda}</b> por <b>{mejor['precio_eur']:.2f}€</b>\n"
+                f"Ratio actual: {mejor_ratio:.2f} {moneda}/€{comparativa}"
+            )
+            estado_moneda["bajo_umbral_bajo"] = True
+        elif mejor_ratio >= umbral_atraco:
+            estado_moneda["bajo_umbral_bajo"] = False
 
     # Alerta de Arbitraje Real (Compra rentable blindada)
     if mejor_ratio >= umbral_compra:
@@ -567,7 +630,7 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
 
             send_telegram(
                 f"🚨 <b>¡Arbitraje Cazado! {config['bandera']} {moneda}</b>\n"
-                f"Mejor ratio: <b>{mejor_ratio:.2f} {moneda}/€</b> (Objetivo: >={umbral_compra:.2f})\n"
+                f"Mejor ratio: <b>{mejor_ratio:.2f} {moneda}/€</b> (Objetivo: >={umbral_compra:.2f}{indicador_manual})\n"
                 f"{txt_tarjeta}"
                 f"{comparativa}"
             )
@@ -687,7 +750,7 @@ def marcar_resumen_enviado(tipo, estado, ahora):
     elif tipo == "semanal":
         estado["resumenes"]["ultimo_semanal"] = f"{ahora.isocalendar()[0]}-W{ahora.isocalendar()[1]}"
 
-def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
+def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio, estado):
     con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
     lineas = [f"{config['bandera']} <b>{moneda}</b>"]
 
@@ -712,9 +775,18 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
         else:
             lineas.append(f"  {r['valor']} {moneda} → {r['precio_eur']:.2f}€ → {r['ratio']:.2f} {moneda}/€")
 
-    if tipo_cambio:
+    # Mejora 1: margen manual (si existe y es válido, sobrescribe el objetivo mostrado)
+    margen_manual, _ = obtener_margen_manual(moneda, estado)
+    es_manual = margen_manual is not None
+    indicador_manual = " 🔧 manual" if es_manual else ""
+
+    if es_manual:
+        lineas.append(f"  (Objetivo compra hoy: >{margen_manual:.2f}{indicador_manual})")
+    elif tipo_cambio:
         objetivo_hoy = tipo_cambio * MARGENES_OBJETIVO.get(moneda, 1.00)
         lineas.append(f"  (Objetivo compra hoy: >{objetivo_hoy:.2f})")
+
+    if tipo_cambio:
         mejor = max(con_stock, key=lambda x: x["ratio"])
         margen = ((mejor['ratio'] / tipo_cambio) - 1) * 100
         signo = "+" if margen >= 0 else ""
@@ -724,15 +796,17 @@ def formatear_bloque_moneda(moneda, config, resultados, tipo_cambio):
     return lineas
 
 # ─── MODIFICADO: ACEPTA LOS RESULTADOS YA DESCARGADOS ─────────────────────────
-def enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados):
+def enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados, marcar=False):
     lineas = [f"📊 <b>Resumen diario Eneba — {ahora.strftime('%d/%m/%Y')}</b>\n"]
     for moneda, config in MONEDAS.items():
         # En vez de llamar a la API otra vez, recuperamos los datos en caché de la Pasada Única
         resultados = todos_resultados.get(moneda, [])
         tipo_cambio = tipos_cambio.get(moneda)
-        lineas += formatear_bloque_moneda(moneda, config, resultados, tipo_cambio)
+        lineas += formatear_bloque_moneda(moneda, config, resultados, tipo_cambio, estado)
     send_telegram("\n".join(lineas))
-    marcar_resumen_enviado("diario", estado, ahora)
+    # Mejora 2: solo marcar ultimo_diario si es un envío automático (no manual)
+    if marcar:
+        marcar_resumen_enviado("diario", estado, ahora)
 
 def enviar_resumen_semanal(estado, ahora):
     lineas = [f"📈 <b>Resumen semanal Eneba — semana {ahora.isocalendar()[1]}</b>\n"]
@@ -790,7 +864,8 @@ def main():
     # Si se pulsa el botón manual, procesa el resumen con los datos frescos y corta ejecución
     if resumen_forzado:
         print(f"Resumen forzado por acción: {accion}")
-        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados)
+        # Mejora 2: marcar=False para que el resumen automático del día siga enviándose
+        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados, marcar=False)
         guardar_estado(estado)
         return
 
@@ -802,7 +877,7 @@ def main():
     # Turno del informe diario: Usa los datos guardados en memoria, tardando 0 segundos adicionales
     if hora_utc >= 9 and debe_enviar_resumen("diario", estado, ahora):
         print("Enviando resumen diario...")
-        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados)
+        enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados, marcar=True)
 
     # Bucle de evaluación de alertas e historial usando los datos ya cacheados
     for moneda, config in MONEDAS.items():
