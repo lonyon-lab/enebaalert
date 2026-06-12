@@ -1,5 +1,6 @@
 name: Alerta Eneba TRY
 on:
+ 
   workflow_dispatch:
     inputs:
       accion:
@@ -15,7 +16,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Instalar dependencias
-        run: pip install requests
+        run: pip install requests pyyaml
       - name: Ejecutar script
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
