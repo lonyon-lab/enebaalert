@@ -1,10 +1,12 @@
 # ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║  EXPERIMENTO 2: Extraer sha256Hash de Eneba con Playwright                  ║
-# ║  Abre la página con un navegador real e intercepta la petición GraphQL    ║
-# ║  para capturar el sha256Hash de ProductNoCache                             ║
+# ║  ACTUALIZADOR DE SHA ENEBA (Playwright)                                     ║
+# ║  Abre la página con un navegador real, intercepta la petición GraphQL      ║
+# ║  para capturar el sha256Hash de ProductNoCache, lo compara con el SHA      ║
+# ║  actual de check_price.py y lo actualiza si ha cambiado.                   ║
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 import os
+import re
 import json
 import base64
 import requests
@@ -17,27 +19,45 @@ GITHUB_HEADERS = {
     "Accept": "application/vnd.github+json"
 }
 
+TELEGRAM_TOKEN = os.environ["TELEGRAM_TOKEN"]
+TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+
 URL_PRODUCTO = "https://www.eneba.com/es/xbox-xbox-live-gift-card-25-try-xbox-live-key-turkey"
 
 
-def guardar_en_github(nombre_archivo, contenido_texto):
+def send_telegram(msg):
+    try:
+        requests.get(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            params={"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "HTML"},
+            timeout=10
+        )
+    except Exception as e:
+        print(f"Error enviando Telegram: {e}")
+
+
+def leer_archivo_github(nombre_archivo):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{nombre_archivo}"
     r = requests.get(url, headers=GITHUB_HEADERS, timeout=10)
-    sha_archivo = r.json().get("sha") if r.status_code == 200 else None
+    if r.status_code != 200:
+        return None, None
+    data = r.json()
+    contenido = base64.b64decode(data["content"]).decode("utf-8")
+    return contenido, data["sha"]
 
+
+def guardar_archivo_github(nombre_archivo, contenido_texto, sha_archivo):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{nombre_archivo}"
     body = {
-        "message": f"Actualizar {nombre_archivo}",
+        "message": f"Actualizar {nombre_archivo} (SHA Eneba)",
         "content": base64.b64encode(contenido_texto.encode("utf-8")).decode("utf-8"),
+        "sha": sha_archivo,
     }
-    if sha_archivo:
-        body["sha"] = sha_archivo
-
     resp = requests.put(url, headers=GITHUB_HEADERS, json=body, timeout=10)
-    print(f"Guardado {nombre_archivo} -> status {resp.status_code}")
+    return resp.status_code in (200, 201)
 
 
-def main():
-    capturas = []
+def extraer_sha_con_playwright():
     sha_encontrado = None
 
     print("Lanzando navegador headless...")
@@ -53,15 +73,9 @@ def main():
                     if post_data and "ProductNoCache" in post_data:
                         body_json = json.loads(post_data)
                         sha = body_json.get("extensions", {}).get("persistedQuery", {}).get("sha256Hash")
-                        if sha:
-                            capturas.append({
-                                "operationName": body_json.get("operationName"),
-                                "sha256Hash": sha,
-                                "url": request.url
-                            })
-                            if body_json.get("operationName") == "ProductNoCache":
-                                sha_encontrado = sha
-                                print(f"  -> SHA capturado: {sha[:80]}...")
+                        if sha and body_json.get("operationName") == "ProductNoCache":
+                            sha_encontrado = sha
+                            print(f"  -> SHA capturado: {sha[:80]}...")
                 except Exception as e:
                     print(f"  Error procesando request: {e}")
 
@@ -73,10 +87,8 @@ def main():
         except Exception as e:
             print(f"Timeout o error en goto (puede ser normal): {e}")
 
-        # Esperar un poco más por si hay peticiones diferidas
         page.wait_for_timeout(5000)
 
-        # Intentar interactuar: hacer scroll para disparar lazy loading
         try:
             page.mouse.wheel(0, 1000)
             page.wait_for_timeout(3000)
@@ -85,33 +97,58 @@ def main():
 
         browser.close()
 
-    # Construir resultado
-    salida = []
-    salida.append("=== RESULTADO EXTRACCIÓN SHA ENEBA (Playwright) ===\n")
-    salida.append(f"Página analizada: {URL_PRODUCTO}\n")
-    salida.append(f"Peticiones GraphQL con persistedQuery capturadas: {len(capturas)}\n\n")
+    return sha_encontrado
 
-    if capturas:
-        salida.append("--- PETICIONES CAPTURADAS ---\n\n")
-        for i, c in enumerate(capturas, 1):
-            salida.append(f"#{i} operationName: {c['operationName']}\n")
-            salida.append(f"   sha256Hash: {c['sha256Hash']}\n\n")
 
-        if sha_encontrado:
-            salida.append("--- SHA DE ProductNoCache ENCONTRADO ---\n")
-            salida.append(sha_encontrado + "\n")
-        else:
-            salida.append("No se encontró específicamente 'ProductNoCache', pero hay otras operaciones capturadas arriba.\n")
+def main():
+    sha_nuevo = extraer_sha_con_playwright()
+
+    if not sha_nuevo:
+        print("No se pudo extraer el SHA con Playwright.")
+        send_telegram(
+            "❌ <b>Actualización de SHA fallida</b>\n"
+            "No se pudo capturar el sha256Hash con Playwright. "
+            "Eneba puede haber cambiado su estructura o bloqueado la carga."
+        )
+        return
+
+    print(f"SHA extraído: {sha_nuevo}")
+
+    # Leer check_price.py actual
+    contenido, sha_archivo = leer_archivo_github("check_price.py")
+    if contenido is None:
+        print("No se pudo leer check_price.py desde GitHub.")
+        send_telegram("❌ <b>Error:</b> No se pudo leer check_price.py desde GitHub para comparar el SHA.")
+        return
+
+    # Buscar el SHA actual con regex
+    match = re.search(r'SHA = "([^"]+)"', contenido)
+    if not match:
+        print("No se encontró la variable SHA en check_price.py.")
+        send_telegram("❌ <b>Error:</b> No se encontró la variable SHA en check_price.py.")
+        return
+
+    sha_actual = match.group(1)
+    print(f"SHA actual en check_price.py: {sha_actual}")
+
+    if sha_nuevo == sha_actual:
+        print("El SHA no ha cambiado.")
+        send_telegram("ℹ️ <b>SHA sin cambios</b>\nEl SHA extraído coincide con el actual en check_price.py.")
+        return
+
+    # SHA distinto: actualizar check_price.py
+    contenido_nuevo = contenido.replace(f'SHA = "{sha_actual}"', f'SHA = "{sha_nuevo}"')
+
+    if guardar_archivo_github("check_price.py", contenido_nuevo, sha_archivo):
+        print("check_price.py actualizado con el nuevo SHA.")
+        send_telegram(
+            "✅ <b>SHA actualizado automáticamente</b>\n"
+            f"Antiguo: <code>{sha_actual[:40]}...</code>\n"
+            f"Nuevo: <code>{sha_nuevo[:40]}...</code>"
+        )
     else:
-        salida.append("No se capturó ninguna petición GraphQL con persistedQuery.\n")
-        salida.append("Posibles causas:\n")
-        salida.append("- La página no llegó a hacer esa petición en este contexto (headless/sin región seleccionada)\n")
-        salida.append("- Cloudflare u otra protección bloqueó la carga\n")
-
-    contenido_final = "".join(salida)
-    print("\n" + contenido_final[:1000])
-
-    guardar_en_github("sha_encontrado_playwright.txt", contenido_final)
+        print("Error al guardar check_price.py en GitHub.")
+        send_telegram("❌ <b>Error:</b> El SHA cambió pero no se pudo actualizar check_price.py en GitHub.")
 
 
 if __name__ == "__main__":
