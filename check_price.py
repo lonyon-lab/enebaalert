@@ -26,6 +26,9 @@ MARGENES_OBJETIVO = {
 # Margen de aviso de "atraco" (Cuando el precio se infla demasiado en Eneba)
 MARGEN_ALTO_ATRACO = 0.90  # Si el ratio es peor que un -10% vs mercado, avisa de precio alto
 
+# % de mejora necesaria sobre la última alerta para volver a alertar (anti-spam consistente)
+MARGEN_REALERTA_PCT = 0.6  # ej: 0.6 = se necesita un +0.6% de mejora sobre el último ratio alertado
+
 # ─── CONFIGURACIÓN DE MONEDAS ─────────────────────────────────────────────────
 MONEDAS = {
     "TRY": {
@@ -617,7 +620,7 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
         debe_alertar = False
         if not estado_moneda.get("sobre_umbral"):
             debe_alertar = True
-        elif ultimo is not None and mejor_ratio > ultimo + 0.5:
+        elif ultimo is not None and mejor_ratio > ultimo * (1 + MARGEN_REALERTA_PCT / 100):
             debe_alertar = True
 
         if debe_alertar:
