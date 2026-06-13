@@ -646,6 +646,23 @@ def procesar_alertas(moneda, config, resultados, estado, tipos_cambio):
     estado["monedas"][moneda] = estado_moneda
 
 # ─── MODIFICADO: REDUCCIÓN DE HISTORIAL Y LOG MENSUAL AUTOMÁTICO EN GITHUB ───
+def actualizar_precios_actuales(moneda, resultados, estado):
+    """
+    Guarda en estado["precios_actuales"][moneda] un diccionario {valor: precio_eur}
+    con las tarjetas que tienen stock ahora mismo. Usado por el bot de Telegram
+    para los comandos /try, /brl, etc. (comparador de combinaciones de tarjetas).
+    """
+    if "precios_actuales" not in estado:
+        estado["precios_actuales"] = {}
+
+    precios = {}
+    for r in resultados:
+        if r["stock"] == "ok" and r["precio_eur"]:
+            precios[str(r["valor"])] = round(r["precio_eur"], 4)
+
+    estado["precios_actuales"][moneda] = precios
+
+
 def guardar_historial(moneda, resultados, estado, ahora):
     con_stock = [r for r in resultados if r["stock"] == "ok" and r["ratio"]]
     if not con_stock:
@@ -887,6 +904,7 @@ def main():
         resultados = todos_resultados[moneda]
         procesar_alertas(moneda, config, resultados, estado, tipos_cambio)
         guardar_historial(moneda, resultados, estado, ahora)
+        actualizar_precios_actuales(moneda, resultados, estado)
 
     guardar_estado(estado)
 
