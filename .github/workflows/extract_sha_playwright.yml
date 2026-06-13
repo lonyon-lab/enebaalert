@@ -1,4 +1,4 @@
-name: Extraer SHA Eneba con Playwright (experimento)
+name: Actualizar SHA Eneba (Playwright)
 on:
   workflow_dispatch:
 jobs:
@@ -16,4 +16,6 @@ jobs:
       - name: Ejecutar script
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python extract_sha_playwright.py
