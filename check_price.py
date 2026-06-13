@@ -449,6 +449,8 @@ def guardar_estado(estado):
                 # porque representa la información más reciente.
 
             # 3. Preparar y enviar el estado fusionado
+            # Timestamp de última actualización, usado por /status en el bot de Telegram
+            estado["ultima_actualizacion"] = datetime.now(timezone.utc).isoformat()
             contenido = json.dumps(estado, indent=2).encode("utf-8")
             contenido_b64 = base64.b64encode(contenido).decode("utf-8")
 
