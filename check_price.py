@@ -854,6 +854,49 @@ def enviar_resumen_semanal(estado, ahora):
 
 PALABRAS_RESUMEN = ["resu", "resumen", "lista", "enviar", "envio", "precios", "precio", "prices", "summary"]
 
+# ─── ESTADO PÚBLICO TRY (para el bot público tryeneba_bot) ────────────────────
+def actualizar_estado_try_publico(todos_resultados, tipos_cambio, ahora):
+    """
+    Escribe estado_try_publico.json en el repo con los precios actuales de TRY
+    y el tipo de cambio oficial. Lo lee el Worker del bot público tryeneba_bot.
+    """
+    try:
+        resultados_try = todos_resultados.get("TRY", [])
+        precios = {}
+        for r in resultados_try:
+            if r["stock"] == "ok" and r["precio_eur"]:
+                precios[str(r["valor"])] = round(r["precio_eur"], 4)
+
+        tipo_cambio = round(tipos_cambio.get("TRY", 0), 2)
+
+        datos = {
+            "ultima_actualizacion": ahora.isoformat(),
+            "tipo_cambio": tipo_cambio,
+            "precios": precios
+        }
+
+        nombre_archivo = "estado_try_publico.json"
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{nombre_archivo}"
+
+        r = safe_get(url, headers=GITHUB_HEADERS, timeout=10)
+        sha_archivo = r.json().get("sha") if r and r.status_code == 200 else None
+
+        contenido = json.dumps(datos, indent=2).encode("utf-8")
+        body = {
+            "message": "Actualizar estado_try_publico.json",
+            "content": base64.b64encode(contenido).decode("utf-8")
+        }
+        if sha_archivo:
+            body["sha"] = sha_archivo
+
+        res = safe_put(url, headers=GITHUB_HEADERS, json=body, timeout=10)
+        if res and res.status_code in (200, 201):
+            print("estado_try_publico.json actualizado ✅")
+        else:
+            print(f"❌ Error actualizando estado_try_publico.json: {res.status_code if res else 'sin respuesta'}")
+    except Exception as e:
+        print(f"Error en actualizar_estado_try_publico: {e}")
+
 # ─── MODIFICADO: CONTROLADOR PRINCIPAL CON PASADA ÚNICA ───────────────────────
 def main():
     ahora = datetime.now(timezone.utc)
@@ -909,6 +952,7 @@ def main():
         actualizar_precios_actuales(moneda, resultados, estado)
 
     guardar_estado(estado)
+    actualizar_estado_try_publico(todos_resultados, tipos_cambio, ahora)
 
 if __name__ == "__main__":
     main()
