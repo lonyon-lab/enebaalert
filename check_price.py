@@ -855,7 +855,7 @@ def enviar_resumen_semanal(estado, ahora):
 PALABRAS_RESUMEN = ["resu", "resumen", "lista", "enviar", "envio", "precios", "precio", "prices", "summary"]
 
 # ─── MONEDAS FIAT DEL BOT PÚBLICO ────────────────────────────────────────────
-MONEDAS_FIAT_PUBLICO = ["EUR", "GBP", "PLN", "SEK", "NOK", "CHF", "USD", "CAD", "AUD", "MXN", "ARS"]
+MONEDAS_FIAT_PUBLICO = ["EUR", "GBP", "PLN", "SEK", "NOK", "CHF", "USD", "CAD", "AUD", "MXN", "ARS", "BRL"]
 
 # ─── ESTADO PÚBLICO TRY (para el bot público tryeneba_bot) ────────────────────
 def actualizar_estado_try_publico(todos_resultados, tipos_cambio_eur, ahora):
