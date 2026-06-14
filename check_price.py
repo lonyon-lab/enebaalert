@@ -854,11 +854,15 @@ def enviar_resumen_semanal(estado, ahora):
 
 PALABRAS_RESUMEN = ["resu", "resumen", "lista", "enviar", "envio", "precios", "precio", "prices", "summary"]
 
+# ─── MONEDAS FIAT DEL BOT PÚBLICO ────────────────────────────────────────────
+MONEDAS_FIAT_PUBLICO = ["EUR", "GBP", "PLN", "SEK", "NOK", "CHF", "USD", "CAD", "AUD", "MXN", "ARS"]
+
 # ─── ESTADO PÚBLICO TRY (para el bot público tryeneba_bot) ────────────────────
-def actualizar_estado_try_publico(todos_resultados, tipos_cambio, ahora):
+def actualizar_estado_try_publico(todos_resultados, tipos_cambio_eur, ahora):
     """
-    Escribe estado_try_publico.json en el repo con los precios actuales de TRY
-    y el tipo de cambio oficial. Lo lee el Worker del bot público tryeneba_bot.
+    Escribe estado_try_publico.json en el repo con los precios actuales de TRY,
+    el tipo de cambio TRY/EUR y los tipos de cambio EUR→fiat de las monedas
+    soportadas por el bot público. Lo lee el Worker del bot público tryeneba_bot.
     """
     try:
         resultados_try = todos_resultados.get("TRY", [])
@@ -867,12 +871,25 @@ def actualizar_estado_try_publico(todos_resultados, tipos_cambio, ahora):
             if r["stock"] == "ok" and r["precio_eur"]:
                 precios[str(r["valor"])] = round(r["precio_eur"], 4)
 
-        tipo_cambio = round(tipos_cambio.get("TRY", 0), 2)
+        tipo_cambio = round(tipos_cambio_eur.get("TRY", 0), 2)
+
+        # Obtener tipos de cambio TRY→fiat directos para las monedas del bot público
+        # Usamos TRY como base para evitar errores de doble conversión
+        try:
+            r_fiat = safe_get("https://open.er-api.com/v6/latest/TRY", timeout=5)
+            if r_fiat and r_fiat.status_code == 200:
+                rates = r_fiat.json().get("rates", {})
+                tipos_fiat = {m: round(rates[m], 6) for m in MONEDAS_FIAT_PUBLICO if m in rates}
+            else:
+                tipos_fiat = {}
+        except Exception:
+            tipos_fiat = {}
 
         datos = {
             "ultima_actualizacion": ahora.isoformat(),
             "tipo_cambio": tipo_cambio,
-            "precios": precios
+            "precios": precios,
+            "tipos_fiat": tipos_fiat
         }
 
         nombre_archivo = "estado_try_publico.json"
