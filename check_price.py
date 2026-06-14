@@ -932,6 +932,7 @@ def main():
         # Mejora 2: marcar=False para que el resumen automático del día siga enviándose
         enviar_resumen_diario(estado, ahora, tipos_cambio, todos_resultados, marcar=False)
         guardar_estado(estado)
+        actualizar_estado_try_publico(todos_resultados, tipos_cambio, ahora)
         return
 
     # Turno del informe semanal (Solo lee el historial de GitHub, no consume red)
