@@ -1,8 +1,7 @@
 name: Actualizar tipos de cambio
 
 on:
-  repository_dispatch:
-    types: [update-tipos-cambio]
+  workflow_dispatch:
 
 jobs:
   update:
