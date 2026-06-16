@@ -1,7 +1,7 @@
 name: Check Eneba prices (Premium TRY)
 
 on:
- 
+  
   workflow_dispatch:        # Por si quieres lanzarlo manualmente
 
 jobs:
@@ -13,6 +13,14 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
+
+      # NUEVO: Paso intermedio con retraso aleatorio de 15 a 45 segundos
+      - name: Espera aleatoria
+        run: |
+          RETRASO=$((RANDOM % 31 + 15))
+          echo "Haciendo una pausa de $RETRASO segundos..."
+          sleep $RETRASO
+
       - name: Ejecutar script premium
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
