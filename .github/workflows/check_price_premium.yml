@@ -1,8 +1,7 @@
 name: Check Eneba prices (Premium TRY)
 
 on:
-  schedule:
-       - cron: '3-58/5 * * * *'   # Cada 5 minutos
+ 
   workflow_dispatch:        # Por si quieres lanzarlo manualmente
 
 jobs:
