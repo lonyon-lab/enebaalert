@@ -5,14 +5,14 @@
       "sobre_umbral": true,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "BRL": {
       "ultimo_ratio_alertado": 6.4935064935064934,
       "sobre_umbral": true,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "CLP": {
       "ultimo_ratio_alertado": null,
@@ -26,21 +26,21 @@
       "sobre_umbral": true,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "ZAR": {
       "ultimo_ratio_alertado": 19.76284584980237,
       "sobre_umbral": true,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "SAR": {
       "ultimo_ratio_alertado": null,
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "TWD": {
       "ultimo_ratio_alertado": null,
@@ -54,14 +54,14 @@
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "JPY": {
       "ultimo_ratio_alertado": null,
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     }
   },
   "historial": [
@@ -38470,62 +38470,15 @@
     "JPY": 184.835525
   },
   "precios_actuales": {
-    "TRY": {
-      "25": 0.47,
-      "50": 0.97,
-      "100": 1.94,
-      "300": 5.76
-    },
-    "BRL": {
-      "5": 0.77,
-      "10": 1.59,
-      "15": 2.43,
-      "20": 3.4,
-      "40": 6.39,
-      "50": 7.85,
-      "100": 15.54
-    },
+    "TRY": {},
+    "BRL": {},
     "CLP": {},
-    "COP": {
-      "30000": 7.68,
-      "55000": 14.23,
-      "100000": 23.68,
-      "150000": 37.88
-    },
-    "ZAR": {
-      "50": 2.58,
-      "100": 5.31,
-      "120": 6.56,
-      "150": 7.59,
-      "200": 10.68,
-      "250": 13.78,
-      "300": 16.45,
-      "350": 19.29,
-      "450": 24.85,
-      "500": 26.79,
-      "550": 29.4,
-      "600": 31.99
-    },
-    "SAR": {
-      "50": 11.45,
-      "100": 22.92,
-      "200": 45.77,
-      "300": 68.47
-    },
+    "COP": {},
+    "ZAR": {},
+    "SAR": {},
     "TWD": {},
-    "HKD": {
-      "150": 16.87,
-      "300": 33.17,
-      "600": 66.71
-    },
-    "JPY": {
-      "1000": 6.49,
-      "2000": 12.0,
-      "2500": 15.12,
-      "3000": 18.12,
-      "5000": 30.11,
-      "10000": 60.37
-    }
+    "HKD": {},
+    "JPY": {}
   },
-  "ultima_actualizacion": "2026-06-23T15:34:09.196646+00:00"
+  "ultima_actualizacion": "2026-06-23T16:04:04.629550+00:00"
 }
