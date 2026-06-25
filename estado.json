@@ -33,7 +33,7 @@
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
-      "api_error_alertado": false
+      "api_error_alertado": true
     },
     "SAR": {
       "ultimo_ratio_alertado": null,
@@ -46,8 +46,8 @@
       "ultimo_ratio_alertado": null,
       "sobre_umbral": false,
       "bajo_umbral_bajo": false,
-      "sin_datos_alertado": false,
-      "api_error_alertado": true
+      "sin_datos_alertado": true,
+      "api_error_alertado": false
     },
     "HKD": {
       "ultimo_ratio_alertado": null,
@@ -290,15 +290,13 @@
     "HKD": 8.899625,
     "JPY": 183.627085
   },
-  "ultima_actualizacion": "2026-06-25T13:53:50.791971+00:00",
+  "ultima_actualizacion": "2026-06-25T14:07:44.896574+00:00",
   "precios_actuales": {
     "TRY": {},
     "BRL": {},
     "CLP": {},
     "COP": {},
-    "ZAR": {
-      "450": 24.8
-    },
+    "ZAR": {},
     "SAR": {},
     "TWD": {},
     "HKD": {},
