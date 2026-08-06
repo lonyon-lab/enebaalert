@@ -5187,7 +5187,7 @@
       "timestamp": "2026-07-30T03:33:15.828778+00:00",
       "mejor_ratio": 8.96,
       "mejor_valor": 600,
-      "mejor_precio_eur": 67.0
+      "mejor_precio_eur": 67
     },
     {
       "moneda": "JPY",
@@ -5614,7 +5614,7 @@
       "timestamp": "2026-07-30T07:03:17.553868+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -5677,7 +5677,7 @@
       "timestamp": "2026-07-30T07:33:18.634794+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -5740,7 +5740,7 @@
       "timestamp": "2026-07-30T08:03:23.316322+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -5803,7 +5803,7 @@
       "timestamp": "2026-07-30T08:33:14.697104+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -5866,7 +5866,7 @@
       "timestamp": "2026-07-30T09:03:20.043160+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -5929,7 +5929,7 @@
       "timestamp": "2026-07-30T09:33:13.439010+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -5992,7 +5992,7 @@
       "timestamp": "2026-07-30T09:37:41.833912+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -6055,7 +6055,7 @@
       "timestamp": "2026-07-30T10:03:24.439262+00:00",
       "mejor_ratio": 4.41,
       "mejor_valor": 300,
-      "mejor_precio_eur": 68.0
+      "mejor_precio_eur": 68
     },
     {
       "moneda": "TWD",
@@ -6137,7 +6137,7 @@
     {
       "moneda": "JPY",
       "timestamp": "2026-07-30T10:33:23.088210+00:00",
-      "mejor_ratio": 178.0,
+      "mejor_ratio": 178,
       "mejor_valor": 10000,
       "mejor_precio_eur": 56.18
     },
@@ -9793,7 +9793,7 @@
       "timestamp": "2026-07-31T16:03:22.610395+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -9856,7 +9856,7 @@
       "timestamp": "2026-07-31T16:33:14.723447+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -9919,7 +9919,7 @@
       "timestamp": "2026-07-31T17:03:16.588506+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -9982,7 +9982,7 @@
       "timestamp": "2026-07-31T17:33:17.399484+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10045,7 +10045,7 @@
       "timestamp": "2026-07-31T18:03:16.665157+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10108,7 +10108,7 @@
       "timestamp": "2026-07-31T18:33:22.948725+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10171,7 +10171,7 @@
       "timestamp": "2026-07-31T19:03:22.275852+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10234,7 +10234,7 @@
       "timestamp": "2026-07-31T19:33:17.879689+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10297,7 +10297,7 @@
       "timestamp": "2026-07-31T20:03:20.348420+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10360,7 +10360,7 @@
       "timestamp": "2026-07-31T20:33:25.256422+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10423,7 +10423,7 @@
       "timestamp": "2026-07-31T20:34:49.845589+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10486,7 +10486,7 @@
       "timestamp": "2026-07-31T21:03:15.330788+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10549,7 +10549,7 @@
       "timestamp": "2026-07-31T21:33:15.996067+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10612,7 +10612,7 @@
       "timestamp": "2026-07-31T22:03:15.034166+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10675,7 +10675,7 @@
       "timestamp": "2026-07-31T22:33:13.064103+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10738,7 +10738,7 @@
       "timestamp": "2026-07-31T23:03:24.248920+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10801,7 +10801,7 @@
       "timestamp": "2026-07-31T23:33:19.430352+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10864,7 +10864,7 @@
       "timestamp": "2026-08-01T00:03:20.519360+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10927,7 +10927,7 @@
       "timestamp": "2026-08-01T00:33:14.617308+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -10990,7 +10990,7 @@
       "timestamp": "2026-08-01T01:03:15.757789+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11053,7 +11053,7 @@
       "timestamp": "2026-08-01T01:33:15.566501+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11116,7 +11116,7 @@
       "timestamp": "2026-08-01T02:03:16.980389+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11179,7 +11179,7 @@
       "timestamp": "2026-08-01T02:33:24.726537+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11242,7 +11242,7 @@
       "timestamp": "2026-08-01T03:03:17.807870+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11305,7 +11305,7 @@
       "timestamp": "2026-08-01T03:33:14.201322+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11368,7 +11368,7 @@
       "timestamp": "2026-08-01T04:03:15.432728+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11431,7 +11431,7 @@
       "timestamp": "2026-08-01T04:33:17.383781+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11494,7 +11494,7 @@
       "timestamp": "2026-08-01T05:03:15.038283+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11557,7 +11557,7 @@
       "timestamp": "2026-08-01T05:33:22.507887+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11620,7 +11620,7 @@
       "timestamp": "2026-08-01T06:03:15.132124+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11683,7 +11683,7 @@
       "timestamp": "2026-08-01T06:33:16.246573+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11746,7 +11746,7 @@
       "timestamp": "2026-08-01T07:03:15.592606+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11809,7 +11809,7 @@
       "timestamp": "2026-08-01T07:33:17.115124+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11872,7 +11872,7 @@
       "timestamp": "2026-08-01T08:03:21.026346+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11935,7 +11935,7 @@
       "timestamp": "2026-08-01T08:33:14.750839+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -11998,7 +11998,7 @@
       "timestamp": "2026-08-01T09:03:16.910951+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12061,7 +12061,7 @@
       "timestamp": "2026-08-01T09:17:05.511397+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12124,7 +12124,7 @@
       "timestamp": "2026-08-01T09:33:20.585758+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12187,7 +12187,7 @@
       "timestamp": "2026-08-01T10:03:19.945336+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12250,7 +12250,7 @@
       "timestamp": "2026-08-01T10:33:22.206078+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12313,7 +12313,7 @@
       "timestamp": "2026-08-01T11:03:14.600200+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12376,7 +12376,7 @@
       "timestamp": "2026-08-01T11:33:14.537594+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12439,7 +12439,7 @@
       "timestamp": "2026-08-01T12:03:14.738190+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12502,7 +12502,7 @@
       "timestamp": "2026-08-01T12:33:16.342079+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12565,7 +12565,7 @@
       "timestamp": "2026-08-01T13:03:14.405335+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12628,7 +12628,7 @@
       "timestamp": "2026-08-01T13:33:15.088430+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12691,7 +12691,7 @@
       "timestamp": "2026-08-01T14:03:17.261173+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12754,7 +12754,7 @@
       "timestamp": "2026-08-01T14:33:12.432444+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12817,7 +12817,7 @@
       "timestamp": "2026-08-01T15:03:16.345136+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -12880,7 +12880,7 @@
       "timestamp": "2026-08-01T15:33:17.224163+00:00",
       "mejor_ratio": 204.08,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 49.0
+      "mejor_precio_eur": 49
     },
     {
       "moneda": "TRY",
@@ -29160,5 +29160,6 @@
       "10000": 49.8
     }
   },
-  "ultima_actualizacion": "2026-08-06T19:06:53.014038+00:00"
+  "ultima_actualizacion": "2026-08-06T19:06:53.014038+00:00",
+  "vigilante_alertado": true
 }
