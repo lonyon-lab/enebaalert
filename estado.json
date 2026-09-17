@@ -35032,6 +35032,69 @@
     },
     {
       "moneda": "TRY",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 56.82,
+      "mejor_valor": 25,
+      "mejor_precio_eur": 0.44
+    },
+    {
+      "moneda": "BRL",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 6.67,
+      "mejor_valor": 10,
+      "mejor_precio_eur": 1.5
+    },
+    {
+      "moneda": "CLP",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 932.09,
+      "mejor_valor": 35000,
+      "mejor_precio_eur": 37.55
+    },
+    {
+      "moneda": "COP",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 4659.83,
+      "mejor_valor": 150000,
+      "mejor_precio_eur": 32.19
+    },
+    {
+      "moneda": "ZAR",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 19.59,
+      "mejor_valor": 550,
+      "mejor_precio_eur": 28.08
+    },
+    {
+      "moneda": "SAR",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 4.61,
+      "mejor_valor": 300,
+      "mejor_precio_eur": 65.13
+    },
+    {
+      "moneda": "TWD",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 33.13,
+      "mejor_valor": 500,
+      "mejor_precio_eur": 15.09
+    },
+    {
+      "moneda": "HKD",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 9.54,
+      "mejor_valor": 600,
+      "mejor_precio_eur": 62.88
+    },
+    {
+      "moneda": "JPY",
+      "timestamp": "2026-09-17T12:33:16.817093+00:00",
+      "mejor_ratio": 180.94,
+      "mejor_valor": 3000,
+      "mejor_precio_eur": 16.58
+    },
+    {
+      "moneda": "TRY",
       "timestamp": "2026-09-17T12:33:42.242731+00:00",
       "mejor_ratio": 56.82,
       "mejor_valor": 25,
@@ -35376,5 +35439,5 @@
       "10000": 58.76
     }
   },
-  "ultima_actualizacion": "2026-09-17T12:37:53.957563+00:00"
+  "ultima_actualizacion": "2026-09-17T12:38:20.229941+00:00"
 }
