@@ -2702,7 +2702,7 @@
       "timestamp": "2026-10-02T16:33:16.436065+00:00",
       "mejor_ratio": 9.09,
       "mejor_valor": 600,
-      "mejor_precio_eur": 66.0
+      "mejor_precio_eur": 66
     },
     {
       "moneda": "JPY",
@@ -2891,7 +2891,7 @@
       "timestamp": "2026-10-02T18:04:24.979295+00:00",
       "mejor_ratio": 9.09,
       "mejor_valor": 600,
-      "mejor_precio_eur": 66.0
+      "mejor_precio_eur": 66
     },
     {
       "moneda": "JPY",
@@ -5313,7 +5313,7 @@
       "timestamp": "2026-10-03T12:33:18.198708+00:00",
       "mejor_ratio": 769.23,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 13.0
+      "mejor_precio_eur": 13
     },
     {
       "moneda": "COP",
@@ -5348,7 +5348,7 @@
       "timestamp": "2026-10-03T12:33:18.198708+00:00",
       "mejor_ratio": 9.09,
       "mejor_valor": 600,
-      "mejor_precio_eur": 66.0
+      "mejor_precio_eur": 66
     },
     {
       "moneda": "JPY",
@@ -12759,5 +12759,6 @@
       "10000": 58.83
     }
   },
-  "ultima_actualizacion": "2026-10-05T19:04:22.109688+00:00"
+  "ultima_actualizacion": "2026-10-05T19:04:22.109688+00:00",
+  "vigilante_alertado": true
 }
