@@ -3150,7 +3150,7 @@
       "timestamp": "2026-10-15T13:03:16.344518+00:00",
       "mejor_ratio": 172.41,
       "mejor_valor": 10000,
-      "mejor_precio_eur": 58.0
+      "mejor_precio_eur": 58
     },
     {
       "moneda": "TRY",
@@ -11333,7 +11333,7 @@
       "timestamp": "2026-10-18T04:03:15.428894+00:00",
       "mejor_ratio": 9.09,
       "mejor_valor": 600,
-      "mejor_precio_eur": 66.0
+      "mejor_precio_eur": 66
     },
     {
       "moneda": "JPY",
@@ -11900,7 +11900,7 @@
       "timestamp": "2026-10-18T08:33:15.494129+00:00",
       "mejor_ratio": 9.09,
       "mejor_valor": 600,
-      "mejor_precio_eur": 66.0
+      "mejor_precio_eur": 66
     },
     {
       "moneda": "JPY",
@@ -12971,7 +12971,7 @@
       "timestamp": "2026-10-18T16:33:14.896016+00:00",
       "mejor_ratio": 9.09,
       "mejor_valor": 600,
-      "mejor_precio_eur": 66.0
+      "mejor_precio_eur": 66
     },
     {
       "moneda": "JPY",
@@ -21392,5 +21392,6 @@
       "10000": 57.13
     }
   },
-  "ultima_actualizacion": "2026-10-21T07:34:46.198713+00:00"
+  "ultima_actualizacion": "2026-10-21T07:34:46.198713+00:00",
+  "vigilante_alertado": true
 }
