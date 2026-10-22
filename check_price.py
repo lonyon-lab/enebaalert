@@ -4,7 +4,7 @@
 # ╚══════════════════════════════════════════════════════════════════════════════╝
 
 # ─── SHA (ACTUALIZAR SI LA API FALLA) ────────────────────────────────────────
-SHA = "00beb0fb78c2af3a627d25b100072dfaeb3cdcb874a1c8fe328b27a848ee523a_7bf0df39e1aba1e8444d60f05482216b1bf1b822d94479caf3987a3d9c070ddfeb8877b77f863ca63067737195828ffc147d30dad7a88764118ab99d531a850e"
+SHA = "5cfdf141cd17776316c9c1e4d1db2e89c17b9de10562743a06c5ba9875d82bf0_908973b23508aeb2295f2de6bc779cd3608abb2622e1de5702f5677d5489051e13b878cda16c833e5276d261a50909ebc1667c5f137d1628a7a204822e951a0f"
 
 # ─── MÁRGENES DINÁMICOS EXIGENTES (PORCENTAJES VS MERCADO) ────────────────────
 # > 1.00 significa Arbitraje (ganas dinero frente al cambio oficial del banco).
