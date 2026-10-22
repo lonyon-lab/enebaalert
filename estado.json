@@ -24769,15 +24769,15 @@
   "stock": {
     "xbox-xbox-live-gift-card-25-try-xbox-live-key-turkey": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-10-22T11:33:19.038521+00:00"
+      "ultima_comprobacion": "2026-10-22T12:03:17.504964+00:00"
     },
     "xbox-xbox-live-gift-card-50-try-xbox-live-key-turkey": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-10-22T11:33:19.038521+00:00"
+      "ultima_comprobacion": "2026-10-22T12:03:17.504964+00:00"
     },
     "xbox-xbox-live-gift-card-100-try-xbox-live-key-turkey": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-10-22T11:33:19.038521+00:00"
+      "ultima_comprobacion": "2026-10-22T12:03:17.504964+00:00"
     },
     "xbox-xbox-live-gift-card-300-try-xbox-live-key-turkey": {
       "tiene_stock": true,
@@ -24968,7 +24968,7 @@
       "ultima_comprobacion": "2026-10-22T11:33:19.038521+00:00"
     }
   },
-  "sha_error_alertado": false,
+  "sha_error_alertado": true,
   "ultimos_tipos_cambio": {
     "TRY": 55.764248,
     "BRL": 5.643482,
@@ -25046,6 +25046,6 @@
       "10000": 57.13
     }
   },
-  "ultima_actualizacion": "2026-10-22T11:34:37.076934+00:00",
+  "ultima_actualizacion": "2026-10-22T12:03:37.737702+00:00",
   "vigilante_alertado": false
 }
