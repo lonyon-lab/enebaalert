@@ -1,11 +1,7 @@
 {
-  "ultima_actualizacion": "2026-11-03T19:25:51.410462+00:00",
+  "ultima_actualizacion": "2026-11-03T19:36:59.050618+00:00",
   "tipo_cambio": 55.97,
-  "precios": {
-    "25": 1.53,
-    "50": 3.28,
-    "100": 4.89
-  },
+  "precios": {},
   "tipos_fiat": {
     "EUR": 0.017868,
     "GBP": 0.014918,
