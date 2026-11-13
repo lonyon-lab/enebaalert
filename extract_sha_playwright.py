@@ -133,7 +133,11 @@ def main():
 
     if sha_nuevo == sha_actual:
         print("El SHA no ha cambiado.")
-        send_telegram("ℹ️ <b>SHA sin cambios</b>\nEl SHA extraído coincide con el actual en check_price.py.")
+        send_telegram(
+            "ℹ️ <b>SHA sin cambios</b>\n"
+            "El SHA extraído coincide con el actual en check_price.py.\n"
+            f"SHA: <code>{sha_actual}</code>"
+        )
         return
 
     # SHA distinto: actualizar check_price.py
