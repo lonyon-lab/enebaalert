@@ -8,8 +8,8 @@
       "api_error_alertado": false
     },
     "BRL": {
-      "ultimo_ratio_alertado": null,
-      "sobre_umbral": false,
+      "ultimo_ratio_alertado": 6.8493150684931505,
+      "sobre_umbral": true,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
       "api_error_alertado": false
@@ -45,13 +45,13 @@
     "TWD": {
       "ultimo_ratio_alertado": null,
       "sobre_umbral": false,
-      "bajo_umbral_bajo": true,
+      "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
       "api_error_alertado": false
     },
     "HKD": {
-      "ultimo_ratio_alertado": null,
-      "sobre_umbral": false,
+      "ultimo_ratio_alertado": 9.125475285171103,
+      "sobre_umbral": true,
       "bajo_umbral_bajo": false,
       "sin_datos_alertado": false,
       "api_error_alertado": false
@@ -11530,6 +11530,69 @@
       "mejor_ratio": 164.93,
       "mejor_valor": 3000,
       "mejor_precio_eur": 18.19
+    },
+    {
+      "moneda": "TRY",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 56.6,
+      "mejor_valor": 300,
+      "mejor_precio_eur": 5.3
+    },
+    {
+      "moneda": "BRL",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 6.85,
+      "mejor_valor": 5,
+      "mejor_precio_eur": 0.73
+    },
+    {
+      "moneda": "CLP",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 1052.63,
+      "mejor_valor": 20000,
+      "mejor_precio_eur": 19.0
+    },
+    {
+      "moneda": "COP",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 3731.34,
+      "mejor_valor": 30000,
+      "mejor_precio_eur": 8.04
+    },
+    {
+      "moneda": "ZAR",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 22.61,
+      "mejor_valor": 300,
+      "mejor_precio_eur": 13.27
+    },
+    {
+      "moneda": "SAR",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 4.56,
+      "mejor_valor": 50,
+      "mejor_precio_eur": 10.96
+    },
+    {
+      "moneda": "TWD",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 33.13,
+      "mejor_valor": 500,
+      "mejor_precio_eur": 15.09
+    },
+    {
+      "moneda": "HKD",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 9.13,
+      "mejor_valor": 600,
+      "mejor_precio_eur": 65.75
+    },
+    {
+      "moneda": "JPY",
+      "timestamp": "2026-11-13T13:03:15.470460+00:00",
+      "mejor_ratio": 173.61,
+      "mejor_valor": 3000,
+      "mejor_precio_eur": 17.28
     }
   ],
   "resumenes": {
@@ -11543,139 +11606,139 @@
     },
     "xbox-xbox-live-gift-card-50-try-xbox-live-key-turkey": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-100-try-xbox-live-key-turkey": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-300-try-xbox-live-key-turkey": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-5-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-10-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-15-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-20-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-30-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-40-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-50-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-100-brl-xbox-live-key-brazil": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-10-000-clp-xbox-live-key-chile": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-20-000-clp-xbox-live-key-chile": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-35-000-clp-xbox-live-key-chile": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-30-000-cop-key-colombia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-55-000-cop-key-colombia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-100-000-cop-key-colombia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-150-000-cop-key-colombia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-50-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-100-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-120-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-150-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-200-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-250-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-300-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-350-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-450-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-500-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-550-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-600-zar-xbox-live-key-south-africa": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-50-sar-xbox-live-key-saudi-arabia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-100-usd-xbox-live-key-saudi-arabia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-200-sar-xbox-live-key-saudi-arabia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-300-sar-xbox-live-key-saudi-arabia": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-200-twd-xbox-live-key-taiwan": {
       "tiene_stock": false,
@@ -11683,11 +11746,11 @@
     },
     "xbox-xbox-live-gift-card-250-twd-xbox-live-key-taiwan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-500-twd-xbox-live-key-taiwan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-1000-twd-xbox-live-key-taiwan": {
       "tiene_stock": false,
@@ -11695,23 +11758,23 @@
     },
     "xbox-xbox-live-gift-card-2000-twd-xbox-live-key-taiwan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-150-hkd-xbox-live-key-hong-kong": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-300-hkd-xbox-live-key-hong-kong": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-600-hkd-xbox-live-key-hong-kong": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-1000-jpy-xbox-live-key-japan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-1500-jpy-xbox-live-key-japan": {
       "tiene_stock": false,
@@ -11719,7 +11782,7 @@
     },
     "xbox-xbox-live-gift-card-2000-jpy-xbox-live-key-japan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-2500-jpy-xbox-live-key-japan": {
       "tiene_stock": false,
@@ -11727,15 +11790,15 @@
     },
     "xbox-xbox-live-gift-card-3000-jpy-xbox-live-key-japan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-5000-jpy-xbox-live-key-japan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     },
     "xbox-xbox-live-gift-card-10-000-jpy-xbox-live-key-japan": {
       "tiene_stock": true,
-      "ultima_comprobacion": "2026-11-13T12:33:16.155874+00:00"
+      "ultima_comprobacion": "2026-11-13T13:03:15.470460+00:00"
     }
   },
   "sha_error_alertado": false,
@@ -11752,68 +11815,68 @@
   },
   "precios_actuales": {
     "TRY": {
-      "50": 3.13,
-      "100": 5.03,
-      "300": 5.47
+      "50": 2.99,
+      "100": 4.81,
+      "300": 5.3
     },
     "BRL": {
-      "5": 0.77,
-      "10": 1.57,
-      "15": 2.4,
-      "20": 3.18,
-      "30": 9.41,
-      "40": 6.37,
-      "50": 8.04,
-      "100": 16.29
+      "5": 0.73,
+      "10": 1.5,
+      "15": 2.29,
+      "20": 3.07,
+      "30": 8.99,
+      "40": 6.09,
+      "50": 7.69,
+      "100": 15.47
     },
     "CLP": {
-      "10000": 13.0,
-      "20000": 19.99,
-      "35000": 39.49
+      "10000": 12.32,
+      "20000": 19.0,
+      "35000": 37.55
     },
     "COP": {
-      "30000": 8.41,
-      "55000": 16.42,
-      "100000": 29.72,
-      "150000": 44.76
+      "30000": 8.04,
+      "55000": 15.59,
+      "100000": 28.2,
+      "150000": 42.58
     },
     "ZAR": {
-      "50": 2.74,
-      "100": 5.46,
-      "120": 6.59,
-      "150": 8.45,
-      "200": 11.17,
-      "250": 14.37,
-      "300": 13.99,
-      "350": 16.99,
-      "450": 24.99,
-      "500": 29.0,
-      "550": 31.95,
-      "600": 33.76
+      "50": 2.62,
+      "100": 5.2,
+      "120": 6.3,
+      "150": 8.19,
+      "200": 10.57,
+      "250": 13.63,
+      "300": 13.27,
+      "350": 16.14,
+      "450": 23.61,
+      "500": 27.52,
+      "550": 30.3,
+      "600": 32.04
     },
     "SAR": {
-      "50": 11.57,
-      "100": 23.63,
-      "200": 46.88,
-      "300": 70.23
+      "50": 10.96,
+      "100": 22.37,
+      "200": 44.61,
+      "300": 66.92
     },
     "TWD": {
-      "250": 7.89,
-      "500": 15.89,
-      "2000": 63.37
+      "250": 7.55,
+      "500": 15.09,
+      "2000": 60.36
     },
     "HKD": {
-      "150": 17.52,
-      "300": 35.28,
-      "600": 69.13
+      "150": 16.64,
+      "300": 33.52,
+      "600": 65.75
     },
     "JPY": {
-      "1000": 6.69,
-      "2000": 12.32,
-      "3000": 18.19,
-      "5000": 30.64,
-      "10000": 61.37
+      "1000": 6.4,
+      "2000": 11.67,
+      "3000": 17.28,
+      "5000": 29.06,
+      "10000": 58.46
     }
   },
-  "ultima_actualizacion": "2026-11-13T12:34:03.102250+00:00"
+  "ultima_actualizacion": "2026-11-13T13:04:04.333922+00:00"
 }
