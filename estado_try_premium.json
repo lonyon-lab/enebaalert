@@ -1,8 +1,9 @@
 {
-  "ultima_actualizacion": "2026-11-15T04:55:52.606901+00:00",
+  "ultima_actualizacion": "2026-11-15T05:09:50.896443+00:00",
   "tipo_cambio": 55.58,
   "precios": {
-    "100": 4.89
+    "100": 4.89,
+    "300": 5.3
   },
   "tipos_fiat": {
     "EUR": 0.017991,
